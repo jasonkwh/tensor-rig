@@ -9,14 +9,14 @@ import (
 var _ adapter.TensorRigStorageBucket = &storageGCP{}
 
 type storageGCP struct {
-	core *storageCore
+	core *core
 }
 
 func NewGCPStorage(
-	opts ...storageCoreOption,
-) *storageGCP {
-	core := &storageCore{
-		cfg: DefaultStorageConfig(),
+	opts ...coreOption,
+) adapter.TensorRigStorageBucket {
+	core := &core{
+		cfg: DefaultConfig(),
 	}
 
 	for _, opt := range opts {
@@ -30,22 +30,19 @@ func NewGCPStorage(
 
 func (b *storageGCP) Create(
 	ctx *pulumi.Context,
-	name string,
 	opts ...pulumi.ResourceOption,
 ) (*adapter.TensorRigStorageBucket, error) {
 	_, err := storage.NewBucket(ctx, b.core.cfg.Name, &storage.BucketArgs{
 		Name:                     pulumi.String(b.core.cfg.Name),
 		Location:                 pulumi.String(b.core.cfg.Location),
 		ForceDestroy:             pulumi.Bool(b.core.cfg.ForceDestroy),
-		UniformBucketLevelAccess: pulumi.Bool(true),
-		RetentionPolicy: &storage.BucketRetentionPolicyArgs{
-			RetentionPeriod: pulumi.String(b.core.cfg.RetentionPeriod.String()),
-			IsLocked:        pulumi.Bool(false),
-		},
+		UniformBucketLevelAccess: pulumi.Bool(b.core.cfg.UniformBucketLevelAccess),
+		LifecycleRules:           b.core.cfg.LifecycleRules,
 		Versioning: &storage.BucketVersioningArgs{
 			Enabled: pulumi.Bool(b.core.cfg.VersioningEnabled),
 		},
-		PublicAccessPrevention: pulumi.String("enforced"),
-		StorageClass:           pulumi.String("STANDARD"),
+		PublicAccessPrevention: pulumi.String(string(b.core.cfg.PublicAccessPrevention)),
+		StorageClass:           pulumi.String(string(b.core.cfg.StorageClass)),
+		Labels:                 pulumi.StringMap(b.core.cfg.Labels),
 	}, opts...)
 }

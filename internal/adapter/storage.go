@@ -11,8 +11,8 @@ type TensorRigStorageBucket struct {
 }
 
 type TensorRigStorage interface {
-	CreateBucket(ctx *pulumi.Context,
-		name string,
+	CreateBucket(
+		ctx *pulumi.Context,
 		opts ...pulumi.ResourceOption,
 	) (*TensorRigStorageBucket, error)
 }
