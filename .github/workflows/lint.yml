@@ -1,0 +1,30 @@
+name: Lint
+on:
+  workflow_dispatch:
+  push:
+
+jobs:
+  lint:
+    name: code linting
+    runs-on: ubuntu-latest
+
+    steps:
+      # Checkout your code
+      - name: Checkout code
+        uses: actions/checkout@v7
+
+      # Set up Go environment
+      - name: Set up Go
+        uses: actions/setup-go@v7
+        with:
+          go-version: 1.26
+          check-latest: true
+          cache: true
+
+      - name: Download Dependencies
+        run: go mod download
+
+      - name: Run golangci-lint
+        uses: golangci/golangci-lint-action@v9
+        with:
+          version: v2.11.4

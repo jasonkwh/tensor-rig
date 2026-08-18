@@ -1,0 +1,138 @@
+version: "2"
+run:
+  concurrency: 4
+  go: "1.26"
+  modules-download-mode: mod
+  tests: false
+  allow-parallel-runners: false
+linters:
+  default: none
+  enable:
+    - bidichk
+    - copyloopvar
+    - cyclop
+    - decorder
+    - dupl
+    - err113
+    - errcheck
+    - errchkjson
+    - errname
+    - errorlint
+    - forcetypeassert
+    - funlen
+    - gocognit
+    - goconst
+    - gocritic
+    - gocyclo
+    - godot
+    - godox
+    - gomoddirectives
+    - gomodguard
+    - goprintffuncname
+    - gosec
+    - govet
+    - ineffassign
+    - lll
+    - maintidx
+    - makezero
+    - misspell
+    - mnd
+    - nakedret
+    - nestif
+    - nilerr
+    - nilnil
+    - nlreturn
+    - nolintlint
+    - nonamedreturns
+    - nosprintfhostport
+    - paralleltest
+    - prealloc
+    - predeclared
+    - revive
+    - staticcheck
+    - tagliatelle
+    - testpackage
+    - thelper
+    - tparallel
+    - unconvert
+    - unparam
+    - unused
+    - varnamelen
+    - whitespace
+    - wsl_v5
+  settings:
+    cyclop:
+      max-complexity: 15
+    dogsled:
+      max-blank-identifiers: 2
+    errorlint:
+      errorf: true
+    funlen:
+      lines: 75
+      statements: 60
+    gocognit:
+      min-complexity: 30
+    goconst:
+      min-len: 4
+      min-occurrences: 3
+    gocyclo:
+      min-complexity: 50
+    godot:
+      capital: true
+      period: true
+    govet:
+      enable:
+        - shadow
+    lll:
+      line-length: 120
+    nestif:
+      min-complexity: 6
+    revive:
+      severity: warning
+      rules:
+        - name: atomic
+        - name: confusing-naming
+        - name: duplicated-imports
+    varnamelen:
+      min-name-length: 2
+      check-return: true
+    whitespace:
+      multi-if: true
+      multi-func: false
+    wsl_v5:
+      allow-first-in-block: true
+      allow-whole-block: false
+      branch-max-lines: 2
+  exclusions:
+    generated: lax
+    presets:
+      - comments
+      - common-false-positives
+      - legacy
+      - std-error-handling
+    rules:
+      - linters:
+          - cyclop
+          - goconst
+        path: (.+)_test\.go
+    paths:
+      - mocks
+      - proto
+      - third_party$
+      - builtin$
+      - examples$
+issues:
+  max-issues-per-linter: 50
+  max-same-issues: 3
+formatters:
+  enable:
+    - gofmt
+    - goimports
+  exclusions:
+    generated: lax
+    paths:
+      - mocks
+      - proto
+      - third_party$
+      - builtin$
+      - examples$
