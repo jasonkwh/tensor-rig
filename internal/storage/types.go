@@ -21,6 +21,7 @@ type Config struct {
 	UniformBucketLevelAccess bool
 	PublicAccessPrevention   PublicAccessPrevention
 	StorageClass             StorageClass
+	SoftDeleteEnabled        bool
 }
 
 func DefaultConfig() *Config {
@@ -34,15 +35,16 @@ func DefaultConfig() *Config {
 					Type: pulumi.String("Delete"),
 				},
 				Condition: &storage.BucketLifecycleRuleConditionArgs{
-					DaysSinceNoncurrentTime: pulumi.Int(7),
+					Age: pulumi.Int(7),
 				},
 			},
 		},
-		VersioningEnabled:        true,
+		VersioningEnabled:        false,
 		Labels:                   make(map[string]pulumi.StringInput),
 		UniformBucketLevelAccess: true,
 		PublicAccessPrevention:   PublicAccessPreventionEnforced,
 		StorageClass:             StorageClassRegional,
+		SoftDeleteEnabled:        false,
 	}
 }
 

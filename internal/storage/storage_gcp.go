@@ -32,7 +32,7 @@ func (b *storageGCP) Create(
 	ctx *pulumi.Context,
 	opts ...pulumi.ResourceOption,
 ) (*adapter.TensorRigStorageBucket, error) {
-	_, err := storage.NewBucket(ctx, b.core.cfg.Name, &storage.BucketArgs{
+	bucket, err := storage.NewBucket(ctx, b.core.cfg.Name, &storage.BucketArgs{
 		Name:                     pulumi.String(b.core.cfg.Name),
 		Location:                 pulumi.String(b.core.cfg.Location),
 		ForceDestroy:             pulumi.Bool(b.core.cfg.ForceDestroy),
@@ -44,5 +44,18 @@ func (b *storageGCP) Create(
 		PublicAccessPrevention: pulumi.String(string(b.core.cfg.PublicAccessPrevention)),
 		StorageClass:           pulumi.String(string(b.core.cfg.StorageClass)),
 		Labels:                 pulumi.StringMap(b.core.cfg.Labels),
+		SoftDeletePolicy:       getSoftDeletePolicy(b.core.cfg.SoftDeleteEnabled),
 	}, opts...)
+}
+
+func getSoftDeletePolicy(enabled bool) *storage.BucketSoftDeletePolicyArgs {
+	if enabled {
+		return &storage.BucketSoftDeletePolicyArgs{
+			RetentionDurationSeconds: pulumi.Int(7 * 24 * 60 * 60),
+		}
+	}
+
+	return &storage.BucketSoftDeletePolicyArgs{
+		RetentionDurationSeconds: pulumi.Int(0),
+	}
 }
