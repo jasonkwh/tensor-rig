@@ -1,12 +1,11 @@
 package storage
 
 import (
-	"github.com/jasonkwh/tensor-rig/internal/adapter"
 	"github.com/pulumi/pulumi-gcp/sdk/v9/go/gcp/storage"
 	"github.com/pulumi/pulumi/sdk/v3/go/pulumi"
 )
 
-var _ adapter.TensorRigStorageBucket = &storageGCP{}
+var _ TensorRigStorage = &storageGCP{}
 
 type storageGCP struct {
 	core *core
@@ -14,7 +13,7 @@ type storageGCP struct {
 
 func NewGCPStorage(
 	opts ...coreOption,
-) adapter.TensorRigStorageBucket {
+) TensorRigStorage {
 	core := &core{
 		cfg: DefaultConfig(),
 	}
@@ -31,8 +30,8 @@ func NewGCPStorage(
 func (b *storageGCP) Create(
 	ctx *pulumi.Context,
 	opts ...pulumi.ResourceOption,
-) (*adapter.TensorRigStorageBucket, error) {
-	bucket, err := storage.NewBucket(ctx, b.core.cfg.Name, &storage.BucketArgs{
+) (*storage.Bucket, error) {
+	return storage.NewBucket(ctx, b.core.cfg.Name, &storage.BucketArgs{
 		Name:                     pulumi.String(b.core.cfg.Name),
 		Location:                 pulumi.String(b.core.cfg.Location),
 		ForceDestroy:             pulumi.Bool(b.core.cfg.ForceDestroy),
