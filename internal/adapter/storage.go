@@ -1,4 +1,4 @@
-package storage
+package adapter
 
 import (
 	"github.com/pulumi/pulumi-gcp/sdk/v9/go/gcp/storage"

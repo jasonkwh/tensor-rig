@@ -1,11 +1,12 @@
 package storage
 
 import (
+	"github.com/jasonkwh/tensor-rig/internal/adapter"
 	"github.com/pulumi/pulumi-gcp/sdk/v9/go/gcp/storage"
 	"github.com/pulumi/pulumi/sdk/v3/go/pulumi"
 )
 
-var _ TensorRigStorage = &storageGCP{}
+var _ adapter.TensorRigStorage = &storageGCP{}
 
 type storageGCP struct {
 	core *core
@@ -13,7 +14,7 @@ type storageGCP struct {
 
 func NewGCPStorage(
 	opts ...coreOption,
-) TensorRigStorage {
+) adapter.TensorRigStorage {
 	core := &core{
 		cfg: DefaultConfig(),
 	}
