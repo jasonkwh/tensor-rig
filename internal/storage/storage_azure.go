@@ -9,7 +9,7 @@ import (
 	"github.com/pulumi/pulumi/sdk/v3/go/pulumi"
 )
 
-var _ adapter.TensorRigStorageInterface = &storageAzure{}
+var _ adapter.TensorRigStorage = &storageAzure{}
 
 type storageAzure struct {
 	core *core
@@ -17,7 +17,7 @@ type storageAzure struct {
 
 func NewAzureStorage(
 	opts ...coreOption,
-) adapter.TensorRigStorageInterface {
+) adapter.TensorRigStorage {
 	core := &core{
 		cfg: DefaultConfig(),
 	}

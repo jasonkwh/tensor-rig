@@ -4,7 +4,7 @@ import (
 	"github.com/pulumi/pulumi/sdk/v3/go/pulumi"
 )
 
-type TensorRigStorageInterface interface {
+type TensorRigStorage interface {
 	Create(
 		ctx *pulumi.Context,
 		opts ...pulumi.ResourceOption,

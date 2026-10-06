@@ -6,7 +6,7 @@ import (
 	"github.com/pulumi/pulumi/sdk/v3/go/pulumi"
 )
 
-var _ adapter.TensorRigStorageInterface = &storageGCP{}
+var _ adapter.TensorRigStorage = &storageGCP{}
 
 type storageGCP struct {
 	core *core
@@ -14,7 +14,7 @@ type storageGCP struct {
 
 func NewGCPStorage(
 	opts ...coreOption,
-) adapter.TensorRigStorageInterface {
+) adapter.TensorRigStorage {
 	core := &core{
 		cfg: DefaultConfig(),
 	}

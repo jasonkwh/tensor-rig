@@ -6,7 +6,7 @@ import (
 	"github.com/pulumi/pulumi/sdk/v3/go/pulumi"
 )
 
-var _ adapter.TensorRigStorageInterface = &storageAWS{}
+var _ adapter.TensorRigStorage = &storageAWS{}
 
 type storageAWS struct {
 	core *core
@@ -14,7 +14,7 @@ type storageAWS struct {
 
 func NewAWSStorage(
 	opts ...coreOption,
-) adapter.TensorRigStorageInterface {
+) adapter.TensorRigStorage {
 	core := &core{
 		cfg: DefaultConfig(),
 	}
