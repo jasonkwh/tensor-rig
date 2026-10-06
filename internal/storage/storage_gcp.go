@@ -2,11 +2,11 @@ package storage
 
 import (
 	"github.com/jasonkwh/tensor-rig/internal/adapter"
-	"github.com/pulumi/pulumi-gcp/sdk/v9/go/gcp/storage"
+	"github.com/pulumi/pulumi-gcp/sdk/v10/go/gcp/storage"
 	"github.com/pulumi/pulumi/sdk/v3/go/pulumi"
 )
 
-var _ adapter.TensorRigStorage = &storageGCP{}
+var _ adapter.TensorRigStorageInterface = &storageGCP{}
 
 type storageGCP struct {
 	core *core
@@ -14,7 +14,7 @@ type storageGCP struct {
 
 func NewGCPStorage(
 	opts ...coreOption,
-) adapter.TensorRigStorage {
+) adapter.TensorRigStorageInterface {
 	core := &core{
 		cfg: DefaultConfig(),
 	}
@@ -31,21 +31,52 @@ func NewGCPStorage(
 func (b *storageGCP) Create(
 	ctx *pulumi.Context,
 	opts ...pulumi.ResourceOption,
-) (*storage.Bucket, error) {
+) (pulumi.Resource, error) {
 	return storage.NewBucket(ctx, b.core.cfg.Name, &storage.BucketArgs{
 		Name:                     pulumi.String(b.core.cfg.Name),
 		Location:                 pulumi.String(b.core.cfg.Location),
 		ForceDestroy:             pulumi.Bool(b.core.cfg.ForceDestroy),
 		UniformBucketLevelAccess: pulumi.Bool(b.core.cfg.UniformBucketLevelAccess),
-		LifecycleRules:           b.core.cfg.LifecycleRules,
+		LifecycleRules:           gcpLifecycleRules(b.core.cfg.LifecycleRules),
 		Versioning: &storage.BucketVersioningArgs{
 			Enabled: pulumi.Bool(b.core.cfg.VersioningEnabled),
 		},
 		PublicAccessPrevention: pulumi.String(string(b.core.cfg.PublicAccessPrevention)),
-		StorageClass:           pulumi.String(string(b.core.cfg.StorageClass)),
+		StorageClass:           pulumi.String(gcpStorageClass(b.core.cfg.StorageClass)),
 		Labels:                 pulumi.StringMap(b.core.cfg.Labels),
 		SoftDeletePolicy:       getSoftDeletePolicy(b.core.cfg.SoftDeleteEnabled),
 	}, opts...)
+}
+
+func gcpLifecycleRules(rules []LifecycleRule) storage.BucketLifecycleRuleArray {
+	out := make(storage.BucketLifecycleRuleArray, 0, len(rules))
+	for _, rule := range rules {
+		if rule.DeleteAfterDays <= 0 {
+			continue
+		}
+		out = append(out, &storage.BucketLifecycleRuleArgs{
+			Action: &storage.BucketLifecycleRuleActionArgs{
+				Type: pulumi.String("Delete"),
+			},
+			Condition: &storage.BucketLifecycleRuleConditionArgs{
+				Age: pulumi.Int(rule.DeleteAfterDays),
+			},
+		})
+	}
+	return out
+}
+
+func gcpStorageClass(class StorageClass) string {
+	switch class {
+	case StorageClassInfrequent:
+		return "NEARLINE"
+	case StorageClassCold:
+		return "COLDLINE"
+	case StorageClassArchive:
+		return "ARCHIVE"
+	default:
+		return "STANDARD"
+	}
 }
 
 func getSoftDeletePolicy(enabled bool) *storage.BucketSoftDeletePolicyArgs {

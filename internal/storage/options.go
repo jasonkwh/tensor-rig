@@ -1,9 +1,6 @@
 package storage
 
-import (
-	"github.com/pulumi/pulumi-gcp/sdk/v9/go/gcp/storage"
-	"github.com/pulumi/pulumi/sdk/v3/go/pulumi"
-)
+import "github.com/pulumi/pulumi/sdk/v3/go/pulumi"
 
 type coreOption func(*core)
 
@@ -43,7 +40,7 @@ func WithLabels(labels map[string]pulumi.StringInput) coreOption {
 	}
 }
 
-func WithLifecycleRules(rules storage.BucketLifecycleRuleArray) coreOption {
+func WithLifecycleRules(rules []LifecycleRule) coreOption {
 	return func(c *core) {
 		c.cfg.LifecycleRules = rules
 	}

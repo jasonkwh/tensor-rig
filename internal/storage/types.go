@@ -3,7 +3,6 @@ package storage
 import (
 	"fmt"
 
-	"github.com/pulumi/pulumi-gcp/sdk/v9/go/gcp/storage"
 	"github.com/pulumi/pulumi/sdk/v3/go/pulumi"
 )
 
@@ -15,7 +14,7 @@ type Config struct {
 	Name                     string
 	Location                 string
 	ForceDestroy             bool
-	LifecycleRules           storage.BucketLifecycleRuleArray
+	LifecycleRules           []LifecycleRule
 	VersioningEnabled        bool
 	Labels                   map[string]pulumi.StringInput
 	UniformBucketLevelAccess bool
@@ -26,26 +25,21 @@ type Config struct {
 
 func DefaultConfig() *Config {
 	return &Config{
-		Name:         fmt.Sprintf("%s-storage-%s", storageNamePrefix, "au"),
-		Location:     "australia-southeast2",
-		ForceDestroy: false,
-		LifecycleRules: storage.BucketLifecycleRuleArray{
-			&storage.BucketLifecycleRuleArgs{
-				Action: &storage.BucketLifecycleRuleActionArgs{
-					Type: pulumi.String("Delete"),
-				},
-				Condition: &storage.BucketLifecycleRuleConditionArgs{
-					Age: pulumi.Int(7),
-				},
-			},
-		},
+		Name:                     fmt.Sprintf("%s-storage-%s", storageNamePrefix, "au"),
+		Location:                 "australia-southeast2",
+		ForceDestroy:             false,
+		LifecycleRules:           []LifecycleRule{{DeleteAfterDays: 7}},
 		VersioningEnabled:        false,
 		Labels:                   make(map[string]pulumi.StringInput),
 		UniformBucketLevelAccess: true,
 		PublicAccessPrevention:   PublicAccessPreventionEnforced,
-		StorageClass:             StorageClassRegional,
+		StorageClass:             StorageClassStandard,
 		SoftDeleteEnabled:        false,
 	}
+}
+
+type LifecycleRule struct {
+	DeleteAfterDays int
 }
 
 type PublicAccessPrevention string
@@ -59,10 +53,8 @@ const (
 type StorageClass string
 
 const (
-	StorageClassStandard      StorageClass = "STANDARD"
-	StorageClassMultiRegional StorageClass = "MULTI_REGIONAL"
-	StorageClassRegional      StorageClass = "REGIONAL"
-	StorageClassNearline      StorageClass = "NEARLINE"
-	StorageClassColdline      StorageClass = "COLDLINE"
-	StorageClassArchive       StorageClass = "ARCHIVE"
+	StorageClassStandard   StorageClass = "standard"
+	StorageClassInfrequent StorageClass = "infrequent"
+	StorageClassCold       StorageClass = "cold"
+	StorageClassArchive    StorageClass = "archive"
 )
