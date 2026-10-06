@@ -4,6 +4,7 @@ go 1.26.7
 
 require (
 	github.com/pulumi/pulumi-aws/sdk/v7 v7.48.0
+	github.com/pulumi/pulumi-azure/sdk/v6 v6.40.0
 	github.com/pulumi/pulumi-gcp/sdk/v10 v10.0.0
 	github.com/pulumi/pulumi/sdk/v3 v3.267.0
 )
