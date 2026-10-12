@@ -2,25 +2,30 @@ package storage
 
 import (
 	"github.com/jasonkwh/tensor-rig/internal/adapter"
+	"github.com/jasonkwh/tensor-rig/internal/rig"
 	"github.com/pulumi/pulumi-gcp/sdk/v10/go/gcp/storage"
 	"github.com/pulumi/pulumi/sdk/v3/go/pulumi"
 )
 
-var _ adapter.TensorRigStorage = &storageGCP{}
+var _ adapter.Storage = &storageGCP{}
 
 type storageGCP struct {
 	core *core
 }
 
-func NewGCPStorage(
+func newGCPStorage(
 	opts ...coreOption,
-) adapter.TensorRigStorage {
+) adapter.Storage {
 	core := &core{
 		cfg: DefaultConfig(),
 	}
 
 	for _, opt := range opts {
 		opt(core)
+	}
+
+	if len(core.cfg.Location) == 0 {
+		core.cfg.Location = rig.CloudDefaultLocationGCP
 	}
 
 	return &storageGCP{

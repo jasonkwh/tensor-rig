@@ -4,26 +4,31 @@ import (
 	"strings"
 
 	"github.com/jasonkwh/tensor-rig/internal/adapter"
+	"github.com/jasonkwh/tensor-rig/internal/rig"
 	azurecore "github.com/pulumi/pulumi-azure/sdk/v6/go/azure/core"
 	"github.com/pulumi/pulumi-azure/sdk/v6/go/azure/storage"
 	"github.com/pulumi/pulumi/sdk/v3/go/pulumi"
 )
 
-var _ adapter.TensorRigStorage = &storageAzure{}
+var _ adapter.Storage = &storageAzure{}
 
 type storageAzure struct {
 	core *core
 }
 
-func NewAzureStorage(
+func newAzureStorage(
 	opts ...coreOption,
-) adapter.TensorRigStorage {
+) adapter.Storage {
 	core := &core{
 		cfg: DefaultConfig(),
 	}
 
 	for _, opt := range opts {
 		opt(core)
+	}
+
+	if len(core.cfg.Location) == 0 {
+		core.cfg.Location = rig.CloudDefaultLocationAzure
 	}
 
 	return &storageAzure{

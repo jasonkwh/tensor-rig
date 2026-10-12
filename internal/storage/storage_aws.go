@@ -2,25 +2,30 @@ package storage
 
 import (
 	"github.com/jasonkwh/tensor-rig/internal/adapter"
+	"github.com/jasonkwh/tensor-rig/internal/rig"
 	"github.com/pulumi/pulumi-aws/sdk/v7/go/aws/s3"
 	"github.com/pulumi/pulumi/sdk/v3/go/pulumi"
 )
 
-var _ adapter.TensorRigStorage = &storageAWS{}
+var _ adapter.Storage = &storageAWS{}
 
 type storageAWS struct {
 	core *core
 }
 
-func NewAWSStorage(
+func newAWSStorage(
 	opts ...coreOption,
-) adapter.TensorRigStorage {
+) adapter.Storage {
 	core := &core{
 		cfg: DefaultConfig(),
 	}
 
 	for _, opt := range opts {
 		opt(core)
+	}
+
+	if len(core.cfg.Location) == 0 {
+		core.cfg.Location = rig.CloudDefaultLocationAWS
 	}
 
 	return &storageAWS{

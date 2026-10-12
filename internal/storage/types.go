@@ -3,6 +3,7 @@ package storage
 import (
 	"fmt"
 
+	"github.com/jasonkwh/tensor-rig/internal/rig"
 	"github.com/pulumi/pulumi/sdk/v3/go/pulumi"
 )
 
@@ -25,8 +26,8 @@ type Config struct {
 
 func DefaultConfig() *Config {
 	return &Config{
-		Name:                     fmt.Sprintf("%s-storage-%s", storageNamePrefix, "au"),
-		Location:                 "australia-southeast2",
+		Name: fmt.Sprintf("%s-storage-%s",
+			rig.ResourceNamePrefix, "au"),
 		ForceDestroy:             false,
 		LifecycleRules:           []LifecycleRule{{DeleteAfterDays: 7}},
 		VersioningEnabled:        false,
