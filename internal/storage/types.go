@@ -24,7 +24,7 @@ type Config struct {
 	SoftDeleteEnabled        bool
 }
 
-func DefaultConfig() *Config {
+func defaultStorageConfig() *Config {
 	return &Config{
 		Name: fmt.Sprintf("%s-storage-%s",
 			rig.ResourceNamePrefix, "au"),

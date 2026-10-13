@@ -20,7 +20,7 @@ func newAzureStorage(
 	opts ...coreOption,
 ) adapter.Storage {
 	core := &core{
-		cfg: DefaultConfig(),
+		cfg: defaultStorageConfig(),
 	}
 
 	for _, opt := range opts {

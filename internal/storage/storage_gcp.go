@@ -3,6 +3,7 @@ package storage
 import (
 	"github.com/jasonkwh/tensor-rig/internal/adapter"
 	"github.com/jasonkwh/tensor-rig/internal/rig"
+	"github.com/pulumi/pulumi-gcp/sdk/v10/go/gcp/compute"
 	"github.com/pulumi/pulumi-gcp/sdk/v10/go/gcp/storage"
 	"github.com/pulumi/pulumi/sdk/v3/go/pulumi"
 )
@@ -17,7 +18,7 @@ func newGCPStorage(
 	opts ...coreOption,
 ) adapter.Storage {
 	core := &core{
-		cfg: DefaultConfig(),
+		cfg: defaultStorageConfig(),
 	}
 
 	for _, opt := range opts {
@@ -37,7 +38,7 @@ func (b *storageGCP) Create(
 	ctx *pulumi.Context,
 	opts ...pulumi.ResourceOption,
 ) (pulumi.Resource, error) {
-	return storage.NewBucket(ctx, b.core.cfg.Name, &storage.BucketArgs{
+	bucket, err := storage.NewBucket(ctx, b.core.cfg.Name, &storage.BucketArgs{
 		Name:                     pulumi.String(b.core.cfg.Name),
 		Location:                 pulumi.String(b.core.cfg.Location),
 		ForceDestroy:             pulumi.Bool(b.core.cfg.ForceDestroy),
@@ -51,6 +52,25 @@ func (b *storageGCP) Create(
 		Labels:                 pulumi.StringMap(b.core.cfg.Labels),
 		SoftDeletePolicy:       getSoftDeletePolicy(b.core.cfg.SoftDeleteEnabled),
 	}, opts...)
+	if err != nil {
+		return nil, err
+	}
+
+	account, err := compute.GetDefaultServiceAccount(ctx, &compute.GetDefaultServiceAccountArgs{})
+	if err != nil {
+		return nil, err
+	}
+
+	_, err = storage.NewBucketIAMMember(ctx, b.core.cfg.Name+"-instance", &storage.BucketIAMMemberArgs{
+		Bucket: bucket.Name,
+		Role:   pulumi.String("roles/storage.objectAdmin"),
+		Member: pulumi.String(account.Member),
+	}, opts...)
+	if err != nil {
+		return nil, err
+	}
+
+	return bucket, nil
 }
 
 func gcpLifecycleRules(rules []LifecycleRule) storage.BucketLifecycleRuleArray {
