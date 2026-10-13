@@ -1,6 +1,8 @@
 package instance
 
 import (
+	"fmt"
+
 	"github.com/jasonkwh/tensor-rig/internal/adapter"
 	"github.com/pulumi/pulumi-gcp/sdk/v10/go/gcp/compute"
 	"github.com/pulumi/pulumi/sdk/v3/go/pulumi"
@@ -65,7 +67,7 @@ func (i *instanceGCP) Create(
 	instanceArgs := &compute.InstanceArgs{
 		Name:        pulumi.String(cfg.Name),
 		MachineType: pulumi.String(cfg.MachineType),
-		Zone:        pulumi.String(cfg.Zone),
+		Zone:        pulumi.String(fmt.Sprintf("%s-%s", cfg.Location, cfg.Zone)),
 		BootDisk: &compute.InstanceBootDiskArgs{
 			InitializeParams: &compute.InstanceBootDiskInitializeParamsArgs{
 				Image: pulumi.String(cfg.BootDiskImage),
