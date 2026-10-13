@@ -14,6 +14,12 @@ func WithName(name string) coreOption {
 	}
 }
 
+func WithLocation(location string) coreOption {
+	return func(c *core) {
+		c.cfg.Location = location
+	}
+}
+
 func WithZone(zone string) coreOption {
 	return func(c *core) {
 		c.cfg.Zone = zone

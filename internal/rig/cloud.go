@@ -9,7 +9,7 @@ const (
 )
 
 const (
-	CloudDefaultLocationGCP   string = "australia-southeast2"
-	CloudDefaultLocationAWS   string = "ap-southeast-4"
-	CloudDefaultLocationAzure string = "australiasoutheast"
+	CloudDefaultLocationGCP   = "australia-southeast1"
+	CloudDefaultLocationAWS   = "ap-southeast-2"
+	CloudDefaultLocationAzure = "australiaeast"
 )

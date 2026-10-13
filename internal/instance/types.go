@@ -12,6 +12,7 @@ type core struct {
 
 type Config struct {
 	Name              string
+	Location          string
 	Zone              string
 	MachineType       string
 	BootDiskImage     string
@@ -31,7 +32,8 @@ func defaultGCPInstanceConfig() *Config {
 	return &Config{
 		Name: fmt.Sprintf("%s-instance-%s",
 			rig.ResourceNamePrefix, "au"),
-		Zone:              "australia-southeast1-a",
+		Location:          rig.CloudDefaultLocationGCP,
+		Zone:              "a",
 		MachineType:       "n1-standard-4",
 		BootDiskImage:     "projects/deeplearning-platform-release/global/images/family/pytorch-2-9-cu129-ubuntu-2204-nvidia-580",
 		BootDiskSizeGb:    100,
@@ -50,6 +52,8 @@ func defaultAzureInstanceConfig() *Config {
 	return &Config{
 		Name: fmt.Sprintf("%s-instance-%s",
 			rig.ResourceNamePrefix, "au"),
+		Location:          rig.CloudDefaultLocationAzure,
+		Zone:              "1",
 		MachineType:       "Standard_NC4as_T4_v3",
 		BootDiskImage:     "microsoft-dsvm:ubuntu-hpc:2204:latest",
 		BootDiskSizeGb:    100,
@@ -64,7 +68,8 @@ func defaultAWSInstanceConfig() *Config {
 	return &Config{
 		Name: fmt.Sprintf("%s-instance-%s",
 			rig.ResourceNamePrefix, "au"),
-		Zone:              "ap-southeast-2a",
+		Location:          rig.CloudDefaultLocationAWS,
+		Zone:              "a",
 		MachineType:       "g4dn.xlarge",
 		BootDiskImage:     "/aws/service/deeplearning/ami/x86_64/oss-nvidia-driver-gpu-pytorch-2.7-ubuntu-22.04/latest/ami-id",
 		BootDiskSizeGb:    100,
