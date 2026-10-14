@@ -1,6 +1,7 @@
 package tailscale_test
 
 import (
+	"errors"
 	"strings"
 	"testing"
 
@@ -10,9 +11,18 @@ import (
 func TestCloudConfigEmptyKey(t *testing.T) {
 	t.Parallel()
 
-	got := renderTailscaleCloudConfig(t, "", "box")
-	if got != "" {
-		t.Fatalf("expected empty cloud-config, got %q", got)
+	_, err := tailscale.New("", "box")
+	if !errors.Is(err, tailscale.ErrNoAuthKey) {
+		t.Fatalf("expected ErrNoAuthKey, got %v", err)
+	}
+}
+
+func TestCloudConfigEmptyHostname(t *testing.T) {
+	t.Parallel()
+
+	_, err := tailscale.New("tskey-auth-example", "")
+	if !errors.Is(err, tailscale.ErrNoHostname) {
+		t.Fatalf("expected ErrNoHostname, got %v", err)
 	}
 }
 
@@ -49,7 +59,12 @@ func TestTailscaleCloudConfigQuotesAuthKey(t *testing.T) {
 func renderTailscaleCloudConfig(t *testing.T, authKey, hostname string) string {
 	t.Helper()
 
-	got, err := tailscale.CloudConfig(authKey, hostname)
+	ts, err := tailscale.New(authKey, hostname)
+	if err != nil {
+		t.Fatalf("new tailscale cloud config: %v", err)
+	}
+
+	got, err := ts.Execute()
 	if err != nil {
 		t.Fatalf("render cloud-config: %v", err)
 	}
