@@ -10,7 +10,7 @@ import (
 	"github.com/pulumi/pulumi/sdk/v3/go/pulumi"
 )
 
-var _ adapter.Storage = &storageAzure{}
+var _ = adapter.Storage(&storageAzure{})
 
 type storageAzure struct {
 	core *core

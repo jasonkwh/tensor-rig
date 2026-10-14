@@ -7,7 +7,7 @@ import (
 	"github.com/pulumi/pulumi/sdk/v3/go/pulumi"
 )
 
-var _ adapter.Storage = &storageAWS{}
+var _ = adapter.Storage(&storageAWS{})
 
 type storageAWS struct {
 	core *core

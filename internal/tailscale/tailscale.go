@@ -6,7 +6,7 @@ import (
 	"github.com/jasonkwh/tensor-rig/internal/adapter"
 )
 
-var _ adapter.TailscaleCloudConfig = &tsCloudConfig{}
+var _ = adapter.TailscaleCloudConfig(&tsCloudConfig{})
 
 type tsCloudConfig struct {
 	authKey  string

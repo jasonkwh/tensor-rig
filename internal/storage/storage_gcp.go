@@ -8,7 +8,7 @@ import (
 	"github.com/pulumi/pulumi/sdk/v3/go/pulumi"
 )
 
-var _ adapter.Storage = &storageGCP{}
+var _ = adapter.Storage(&storageGCP{})
 
 type storageGCP struct {
 	core *core
