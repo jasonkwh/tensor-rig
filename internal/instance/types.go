@@ -20,7 +20,7 @@ type Config struct {
 	BootDiskType      string
 	Network           string
 	NicType           string
-	SshPublicKey      string
+	TailscaleAuthKey  string
 	AssignPublicIP    bool
 	AcceleratorType   string
 	AcceleratorCount  int

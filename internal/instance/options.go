@@ -62,9 +62,9 @@ func WithNicType(nicType string) coreOption {
 	}
 }
 
-func WithSshPublicKey(publicKey string) coreOption {
+func WithTailscaleAuthKey(authKey string) coreOption {
 	return func(c *core) {
-		c.cfg.SshPublicKey = publicKey
+		c.cfg.TailscaleAuthKey = authKey
 	}
 }
 

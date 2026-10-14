@@ -4,6 +4,7 @@ import (
 	"fmt"
 
 	"github.com/jasonkwh/tensor-rig/internal/adapter"
+	"github.com/jasonkwh/tensor-rig/internal/tailscale"
 	"github.com/pulumi/pulumi-gcp/sdk/v10/go/gcp/compute"
 	"github.com/pulumi/pulumi/sdk/v3/go/pulumi"
 )
@@ -56,12 +57,9 @@ func (i *instanceGCP) Create(
 		}
 	}
 
-	metadata := pulumi.StringMap{
-		"install-nvidia-driver": pulumi.String("True"),
-	}
-
-	if cfg.SshPublicKey != "" {
-		metadata["ssh-keys"] = pulumi.String("ubuntu:" + cfg.SshPublicKey)
+	metadata, err := gcpInstanceMetadata(cfg)
+	if err != nil {
+		return nil, err
 	}
 
 	instanceArgs := &compute.InstanceArgs{
@@ -100,4 +98,21 @@ func (i *instanceGCP) Create(
 	}
 
 	return instance, nil
+}
+
+func gcpInstanceMetadata(cfg *Config) (pulumi.StringMap, error) {
+	metadata := pulumi.StringMap{
+		"install-nvidia-driver": pulumi.String("True"),
+	}
+
+	userData, err := tailscale.CloudConfig(cfg.TailscaleAuthKey, cfg.Name)
+	if err != nil {
+		return nil, err
+	}
+
+	if userData != "" {
+		metadata["user-data"] = pulumi.String(userData)
+	}
+
+	return metadata, nil
 }
