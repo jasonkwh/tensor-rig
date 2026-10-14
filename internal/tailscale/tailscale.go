@@ -14,14 +14,19 @@ type tsCloudConfig struct {
 }
 
 func New(
-	authKey, hostname string,
+	filePath, hostname string,
 ) (adapter.TailscaleCloudConfig, error) {
-	if len(authKey) == 0 {
-		return nil, ErrNoAuthKey
+	if len(filePath) == 0 {
+		return nil, ErrNoFilePath
 	}
 
 	if len(hostname) == 0 {
 		return nil, ErrNoHostname
+	}
+
+	authKey, err := loadTailscaleAuthKey(filePath)
+	if err != nil {
+		return nil, err
 	}
 
 	return &tsCloudConfig{

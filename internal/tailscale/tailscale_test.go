@@ -2,6 +2,8 @@ package tailscale_test
 
 import (
 	"errors"
+	"os"
+	"path/filepath"
 	"strings"
 	"testing"
 
@@ -11,9 +13,24 @@ import (
 func TestCloudConfigEmptyKey(t *testing.T) {
 	t.Parallel()
 
-	_, err := tailscale.New("", "box")
+	path := writeHeadlessEnv(t, "ssid_home=example\npsk_home=secret\nts_auth_key=tskey-auth-fleet\n")
+	ts, err := tailscale.New(path, "box")
+	if err != nil {
+		t.Fatalf("new tailscale cloud config: %v", err)
+	}
+
+	_, err = ts.Execute()
 	if !errors.Is(err, tailscale.ErrNoAuthKey) {
 		t.Fatalf("expected ErrNoAuthKey, got %v", err)
+	}
+}
+
+func TestCloudConfigEmptyFilePath(t *testing.T) {
+	t.Parallel()
+
+	_, err := tailscale.New("", "box")
+	if !errors.Is(err, tailscale.ErrNoFilePath) {
+		t.Fatalf("expected ErrNoFilePath, got %v", err)
 	}
 }
 
@@ -59,7 +76,8 @@ func TestTailscaleCloudConfigQuotesAuthKey(t *testing.T) {
 func renderTailscaleCloudConfig(t *testing.T, authKey, hostname string) string {
 	t.Helper()
 
-	ts, err := tailscale.New(authKey, hostname)
+	path := writeHeadlessEnv(t, "ssid_home=example\npsk_home=secret\nts_auth_key=tskey-auth-fleet\nts_auth_key_rig="+authKey+"\n")
+	ts, err := tailscale.New(path, hostname)
 	if err != nil {
 		t.Fatalf("new tailscale cloud config: %v", err)
 	}
@@ -70,4 +88,15 @@ func renderTailscaleCloudConfig(t *testing.T, authKey, hostname string) string {
 	}
 
 	return got
+}
+
+func writeHeadlessEnv(t *testing.T, body string) string {
+	t.Helper()
+
+	path := filepath.Join(t.TempDir(), "headless-env")
+	if err := os.WriteFile(path, []byte(body), 0o600); err != nil {
+		t.Fatalf("write headless-env: %v", err)
+	}
+
+	return path
 }
