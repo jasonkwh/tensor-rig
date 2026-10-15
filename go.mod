@@ -1,6 +1,6 @@
 module github.com/jasonkwh/tensor-rig
 
-go 1.26.8
+go 1.27.2
 
 require (
 	github.com/pulumi/pulumi-aws/sdk/v7 v7.50.0
