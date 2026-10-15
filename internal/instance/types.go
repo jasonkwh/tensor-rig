@@ -19,10 +19,10 @@ type Config struct {
 	BootDiskSizeGb    int
 	BootDiskType      string
 	Network           string
-	NicType           string
+	NicType           string // GCP only.
 	AssignPublicIP    bool
-	AcceleratorType   string
-	AcceleratorCount  int
+	AcceleratorType   string // GCP only.
+	AcceleratorCount  int    // GCP only.
 	OnHostMaintenance string
 	ProvisioningModel string
 }
@@ -58,7 +58,6 @@ func defaultAWSInstanceConfig() *Config {
 		BootDiskSizeGb:    100,
 		BootDiskType:      "gp3",
 		Network:           "default",
-		NicType:           "ena",
 		AssignPublicIP:    true,
 		OnHostMaintenance: "terminate",
 		ProvisioningModel: "spot",
