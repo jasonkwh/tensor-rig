@@ -62,12 +62,6 @@ func WithNicType(nicType string) coreOption {
 	}
 }
 
-func WithTailscaleAuthKey(authKey string) coreOption {
-	return func(c *core) {
-		c.cfg.TailscaleAuthKey = authKey
-	}
-}
-
 func WithAssignPublicIP(assign bool) coreOption {
 	return func(c *core) {
 		c.cfg.AssignPublicIP = assign

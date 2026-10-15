@@ -4,18 +4,19 @@ import (
 	"fmt"
 
 	"github.com/jasonkwh/tensor-rig/internal/adapter"
-	"github.com/jasonkwh/tensor-rig/internal/tailscale"
 	"github.com/pulumi/pulumi-gcp/sdk/v10/go/gcp/compute"
 	"github.com/pulumi/pulumi/sdk/v3/go/pulumi"
 )
 
-var _ adapter.Instance = &instanceGCP{}
+var _ = adapter.Instance(&instanceGCP{})
 
 type instanceGCP struct {
-	core *core
+	tsCloudCfg adapter.TailscaleCloudConfig
+	core       *core
 }
 
 func newGCPInstance(
+	tsCloudCfg adapter.TailscaleCloudConfig,
 	opts ...coreOption,
 ) adapter.Instance {
 	core := &core{
@@ -27,7 +28,8 @@ func newGCPInstance(
 	}
 
 	return &instanceGCP{
-		core: core,
+		tsCloudCfg: tsCloudCfg,
+		core:       core,
 	}
 }
 
@@ -57,7 +59,7 @@ func (i *instanceGCP) Create(
 		}
 	}
 
-	metadata, err := gcpInstanceMetadata(cfg)
+	metadata, err := i.gcpInstanceMetadata(cfg)
 	if err != nil {
 		return nil, err
 	}
@@ -100,12 +102,12 @@ func (i *instanceGCP) Create(
 	return instance, nil
 }
 
-func gcpInstanceMetadata(cfg *Config) (pulumi.StringMap, error) {
+func (i *instanceGCP) gcpInstanceMetadata(cfg *Config) (pulumi.StringMap, error) {
 	metadata := pulumi.StringMap{
 		"install-nvidia-driver": pulumi.String("True"),
 	}
 
-	userData, err := tailscale.CloudConfig(cfg.TailscaleAuthKey, cfg.Name)
+	userData, err := i.tsCloudCfg.Execute(cfg.Name)
 	if err != nil {
 		return nil, err
 	}
