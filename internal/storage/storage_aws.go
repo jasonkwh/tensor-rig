@@ -119,36 +119,44 @@ func awsLifecycleRules(cfg *Config) s3.BucketLifecycleConfigurationRuleArray {
 		})
 	}
 
-	if class, days, ok := awsStorageClassTransition(cfg.StorageClass); ok {
-		transition := &s3.BucketLifecycleConfigurationRuleTransitionArgs{
-			StorageClass: pulumi.String(class),
-		}
-		if days > 0 {
-			transition.Days = pulumi.Int(days)
-		}
-		rules = append(rules, &s3.BucketLifecycleConfigurationRuleArgs{
-			Id:     pulumi.String("storage-class"),
-			Status: pulumi.String("Enabled"),
-			Filter: &s3.BucketLifecycleConfigurationRuleFilterArgs{
-				Prefix: pulumi.String(""),
-			},
-			Transitions: s3.BucketLifecycleConfigurationRuleTransitionArray{transition},
-		})
+	if rule := awsStorageClassRule(cfg.StorageClass); rule != nil {
+		rules = append(rules, rule)
 	}
 
 	return rules
 }
 
-func awsStorageClassTransition(class StorageClass) (storageClass string, days int, ok bool) {
+func awsStorageClassRule(class StorageClass) *s3.BucketLifecycleConfigurationRuleArgs {
+	var (
+		storageClass string
+		days         int
+	)
+
 	switch class {
 	case StorageClassInfrequent:
-		return "STANDARD_IA", 30, true
+		storageClass, days = "STANDARD_IA", 30
 	case StorageClassCold:
-		return "GLACIER_IR", 0, true
+		storageClass = "GLACIER_IR"
 	case StorageClassArchive:
-		return "DEEP_ARCHIVE", 0, true
+		storageClass = "DEEP_ARCHIVE"
 	default:
-		return "", 0, false
+		return nil
+	}
+
+	transition := &s3.BucketLifecycleConfigurationRuleTransitionArgs{
+		StorageClass: pulumi.String(storageClass),
+	}
+	if days > 0 {
+		transition.Days = pulumi.Int(days)
+	}
+
+	return &s3.BucketLifecycleConfigurationRuleArgs{
+		Id:     pulumi.String("storage-class"),
+		Status: pulumi.String("Enabled"),
+		Filter: &s3.BucketLifecycleConfigurationRuleFilterArgs{
+			Prefix: pulumi.String(""),
+		},
+		Transitions: s3.BucketLifecycleConfigurationRuleTransitionArray{transition},
 	}
 }
 
