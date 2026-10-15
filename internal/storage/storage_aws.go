@@ -107,6 +107,7 @@ func awsLifecycleRules(cfg *Config) s3.BucketLifecycleConfigurationRuleArray {
 		if rule.DeleteAfterDays <= 0 {
 			continue
 		}
+
 		rules = append(rules, &s3.BucketLifecycleConfigurationRuleArgs{
 			Id:     pulumi.Sprintf("delete-%d", i),
 			Status: pulumi.String("Enabled"),
@@ -160,7 +161,9 @@ func awsStorageClassRule(class StorageClass) *s3.BucketLifecycleConfigurationRul
 	}
 }
 
-func awsPublicAccessBlocked(prevention PublicAccessPrevention) (blocked bool, set bool) {
+func awsPublicAccessBlocked(
+	prevention PublicAccessPrevention,
+) (bool, bool) {
 	switch prevention {
 	case PublicAccessPreventionEnforced:
 		return true, true

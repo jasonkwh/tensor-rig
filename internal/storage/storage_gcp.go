@@ -79,6 +79,7 @@ func gcpLifecycleRules(rules []LifecycleRule) storage.BucketLifecycleRuleArray {
 		if rule.DeleteAfterDays <= 0 {
 			continue
 		}
+
 		out = append(out, &storage.BucketLifecycleRuleArgs{
 			Action: &storage.BucketLifecycleRuleActionArgs{
 				Type: pulumi.String("Delete"),
