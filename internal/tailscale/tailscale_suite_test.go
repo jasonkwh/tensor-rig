@@ -21,10 +21,10 @@ func (s *tsTestSuite) renderTailscaleCloudConfig(authKey, hostname string) strin
 	s.T().Helper()
 
 	path := s.writeHeadlessEnv("ssid_home=example\npsk_home=secret\nts_auth_key=tskey-auth-fleet\nts_auth_key_rig=" + authKey + "\n")
-	ts, err := tailscale.New(path, hostname)
+	ts, err := tailscale.New(path)
 	s.Require().NoError(err)
 
-	got, err := ts.Execute()
+	got, err := ts.Execute(hostname)
 	s.Require().NoError(err)
 
 	return got
