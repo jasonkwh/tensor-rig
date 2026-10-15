@@ -26,11 +26,13 @@ const (
 }`
 	// For GCP Deep Learning VM Boot Disk Image, see:
 	// https://docs.cloud.google.com/deep-learning-vm/docs/images
-	gcpDefaultBootDiskImage = "projects/deeplearning-platform-release/global/images/family/pytorch-2-9-cu129-ubuntu-2204-nvidia-580"
+	gcpDefaultBootDiskImage = "projects/deeplearning-platform-release/global/images/family/pytorch-2-9-cu129-ubuntu-2404-nvidia-580"
 
-	// For AWS Deep Learning AMI, see:
-	// https://docs.aws.amazon.com/dlami/latest/devguide/find-dlami-id.html.
-	awsDefaultBootDiskImage = "/aws/service/deeplearning/ami/x86_64/oss-nvidia-driver-gpu-pytorch-2.7-ubuntu-22.04/latest/ami-id"
+	// AMI ID from the SSM parameter in the instance region:
+	// aws ssm get-parameter --region ap-southeast-2 --name
+	// /aws/service/deeplearning/ami/x86_64/oss-nvidia-driver-gpu-pytorch-2.14-ubuntu-26.04/latest/ami-id
+	// --query Parameter.Value --output text.
+	awsDefaultBootDiskImage = "/aws/service/deeplearning/ami/x86_64/oss-nvidia-driver-gpu-pytorch-2.14-ubuntu-26.04/latest/ami-id"
 
 	defaultBootSizeGB = 100
 )
