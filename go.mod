@@ -4,9 +4,10 @@ go 1.26.8
 
 require (
 	github.com/pulumi/pulumi-aws/sdk/v7 v7.50.0
-	github.com/pulumi/pulumi-azure/sdk/v6 v6.40.0
-	github.com/pulumi/pulumi-gcp/sdk/v10 v10.1.0
-	github.com/pulumi/pulumi/sdk/v3 v3.268.0
+	github.com/pulumi/pulumi-azure/sdk/v6 v6.40.1
+	github.com/pulumi/pulumi-gcp/sdk/v10 v10.1.1
+	github.com/pulumi/pulumi/sdk/v3 v3.269.0
+	github.com/stretchr/testify v1.12.1
 )
 
 require (
@@ -105,6 +106,7 @@ require (
 	go.opentelemetry.io/proto/otlp v1.11.0 // indirect
 	go.uber.org/atomic v1.11.0 // indirect
 	go.uber.org/multierr v1.11.0 // indirect
+	go.yaml.in/yaml/v3 v3.0.5 // indirect
 	golang.org/x/crypto v0.57.0 // indirect
 	golang.org/x/mod v0.41.0 // indirect
 	golang.org/x/net v0.59.0 // indirect
