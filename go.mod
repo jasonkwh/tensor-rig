@@ -4,7 +4,6 @@ go 1.26.8
 
 require (
 	github.com/pulumi/pulumi-aws/sdk/v7 v7.50.0
-	github.com/pulumi/pulumi-azure/sdk/v6 v6.40.1
 	github.com/pulumi/pulumi-gcp/sdk/v10 v10.1.1
 	github.com/pulumi/pulumi/sdk/v3 v3.269.0
 	github.com/stretchr/testify v1.12.1

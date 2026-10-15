@@ -13,8 +13,6 @@ func New(
 	switch cloud {
 	case rig.CloudAWS:
 		return newAWSInstance(tsCloudCfg, opts...)
-	case rig.CloudAzure:
-		return newAzureInstance(tsCloudCfg, opts...)
 	case rig.CloudGCP:
 		return newGCPInstance(tsCloudCfg, opts...)
 	default:

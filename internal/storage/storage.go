@@ -12,8 +12,6 @@ func New(
 	switch cloud {
 	case rig.CloudAWS:
 		return newAWSStorage(opts...)
-	case rig.CloudAzure:
-		return newAzureStorage(opts...)
 	case rig.CloudGCP:
 		return newGCPStorage(opts...)
 	default:

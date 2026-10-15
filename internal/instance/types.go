@@ -47,22 +47,6 @@ func defaultGCPInstanceConfig() *Config {
 	}
 }
 
-func defaultAzureInstanceConfig() *Config {
-	return &Config{
-		Name: fmt.Sprintf("%s-instance-%s",
-			rig.ResourceNamePrefix, "au"),
-		Location:          rig.CloudDefaultLocationAzure,
-		Zone:              "1",
-		MachineType:       "Standard_NC4as_T4_v3",
-		BootDiskImage:     "microsoft-dsvm:ubuntu-hpc:2204:latest",
-		BootDiskSizeGb:    100,
-		BootDiskType:      "StandardSSD_LRS",
-		NicType:           "Accelerated",
-		AssignPublicIP:    true,
-		ProvisioningModel: "Spot",
-	}
-}
-
 func defaultAWSInstanceConfig() *Config {
 	return &Config{
 		Name: fmt.Sprintf("%s-instance-%s",
