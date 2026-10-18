@@ -5,15 +5,12 @@ config:
   cloud:
     type: string
     description: Cloud provider to deploy. Allowed values are gcp and aws.
-    default: gcp
   location:
     type: string
     description: Location for the bucket and instance.
-    default: australia-southeast1
   storageName:
     type: string
     description: Bucket name.
-    default: tensor-rig-storage-au
   storageForceDestroy:
     type: boolean
     description: Delete the bucket even when it still contains objects.
