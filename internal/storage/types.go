@@ -1,11 +1,6 @@
 package storage
 
-import (
-	"fmt"
-
-	"github.com/jasonkwh/tensor-rig/internal/rig"
-	"github.com/pulumi/pulumi/sdk/v3/go/pulumi"
-)
+import "github.com/pulumi/pulumi/sdk/v3/go/pulumi"
 
 type core struct {
 	cfg *Config
@@ -22,21 +17,6 @@ type Config struct {
 	PublicAccessPrevention   PublicAccessPrevention
 	StorageClass             StorageClass
 	SoftDeleteEnabled        bool
-}
-
-func defaultStorageConfig() *Config {
-	return &Config{
-		Name: fmt.Sprintf("%s-storage-%s",
-			rig.ResourceNamePrefix, "au"),
-		ForceDestroy:             false,
-		LifecycleRules:           []LifecycleRule{{DeleteAfterDays: 7}},
-		VersioningEnabled:        false,
-		Labels:                   make(map[string]pulumi.StringInput),
-		UniformBucketLevelAccess: true,
-		PublicAccessPrevention:   PublicAccessPreventionEnforced,
-		StorageClass:             StorageClassStandard,
-		SoftDeleteEnabled:        false,
-	}
 }
 
 type LifecycleRule struct {

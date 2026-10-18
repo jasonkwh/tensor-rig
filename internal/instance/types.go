@@ -31,7 +31,6 @@ func defaultGCPInstanceConfig() *Config {
 	return &Config{
 		Name: fmt.Sprintf("%s-instance-%s",
 			rig.ResourceNamePrefix, "au"),
-		Location:          rig.CloudDefaultLocationGCP,
 		Zone:              "a",
 		MachineType:       "n1-standard-4",
 		BootDiskImage:     gcpDefaultBootDiskImage,
@@ -51,7 +50,6 @@ func defaultAWSInstanceConfig() *Config {
 	return &Config{
 		Name: fmt.Sprintf("%s-instance-%s",
 			rig.ResourceNamePrefix, "au"),
-		Location:          rig.CloudDefaultLocationAWS,
 		Zone:              "a",
 		MachineType:       "g4dn.xlarge",
 		BootDiskImage:     awsDefaultBootDiskImage,

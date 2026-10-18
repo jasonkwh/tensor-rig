@@ -65,3 +65,9 @@ func WithStorageClass(storageClass StorageClass) coreOption {
 		c.cfg.StorageClass = storageClass
 	}
 }
+
+func WithSoftDelete(enabled bool) coreOption {
+	return func(c *core) {
+		c.cfg.SoftDeleteEnabled = enabled
+	}
+}

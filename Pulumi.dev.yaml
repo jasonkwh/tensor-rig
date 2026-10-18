@@ -1,0 +1,11 @@
+config:
+  tensor-rig:cloud: gcp
+  tensor-rig:location: australia-southeast1
+  tensor-rig:storageName: tensor-rig-storage-au
+  tensor-rig:storageDeleteAfterDays: 7
+  tensor-rig:storageForceDestroy: false
+  tensor-rig:storageVersioning: false
+  tensor-rig:storageUniformAccess: true
+  tensor-rig:storagePublicAccess: enforced
+  tensor-rig:storageClass: standard
+  tensor-rig:storageSoftDelete: false

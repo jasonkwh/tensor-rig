@@ -11,11 +11,6 @@ const (
 	CloudAWS Cloud = "aws"
 )
 
-const (
-	CloudDefaultLocationGCP = "australia-southeast1"
-	CloudDefaultLocationAWS = "ap-southeast-2"
-)
-
 func ParseCloud(name string) (Cloud, error) {
 	switch Cloud(strings.ToLower(strings.TrimSpace(name))) {
 	case "", CloudGCP:

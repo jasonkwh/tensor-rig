@@ -1,3 +1,44 @@
 name: tensor-rig
 runtime: go
 description: Personal AI training rig
+config:
+  cloud:
+    type: string
+    description: Cloud provider to deploy. Allowed values are gcp and aws.
+    default: gcp
+  location:
+    type: string
+    description: Location for the bucket and instance.
+    default: australia-southeast1
+  storageName:
+    type: string
+    description: Bucket name.
+    default: tensor-rig-storage-au
+  storageForceDestroy:
+    type: boolean
+    description: Delete the bucket even when it still contains objects.
+    default: false
+  storageDeleteAfterDays:
+    type: integer
+    description: Delete bucket objects after this many days. Zero disables the rule.
+    default: 7
+  storageVersioning:
+    type: boolean
+    description: Enable bucket versioning.
+    default: false
+  storageUniformAccess:
+    type: boolean
+    description: Enable uniform bucket-level access.
+    default: true
+  storagePublicAccess:
+    type: string
+    description: Public access prevention. Allowed values are enforced, inherited, and off.
+    default: enforced
+  storageClass:
+    type: string
+    description: Storage class. Allowed values are standard, infrequent, cold, and archive.
+    default: standard
+  storageSoftDelete:
+    type: boolean
+    description: Enable soft delete.
+    default: false
