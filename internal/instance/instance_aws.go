@@ -14,24 +14,13 @@ var _ = adapter.Instance(&instanceAWS{})
 
 type instanceAWS struct {
 	tsCloudCfg adapter.TailscaleCloudConfig
-	core       *core
+	cfg        *Config
 }
 
-func newAWSInstance(
-	tsCloudCfg adapter.TailscaleCloudConfig,
-	opts ...coreOption,
-) adapter.Instance {
-	core := &core{
-		cfg: defaultAWSInstanceConfig(),
-	}
-
-	for _, opt := range opts {
-		opt(core)
-	}
-
+func newAWSInstance(tsCloudCfg adapter.TailscaleCloudConfig, cfg *Config) adapter.Instance {
 	return &instanceAWS{
 		tsCloudCfg: tsCloudCfg,
-		core:       core,
+		cfg:        cfg,
 	}
 }
 
@@ -39,7 +28,7 @@ func (i *instanceAWS) Create(
 	ctx *pulumi.Context,
 	opts ...pulumi.ResourceOption,
 ) (pulumi.Resource, error) {
-	cfg := i.core.cfg
+	cfg := i.cfg
 
 	imageID, err := awsImageID(ctx, cfg)
 	if err != nil {

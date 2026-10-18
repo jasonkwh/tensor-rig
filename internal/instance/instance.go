@@ -8,14 +8,14 @@ import (
 func New(
 	cloud rig.Cloud,
 	tsCloudCfg adapter.TailscaleCloudConfig,
-	opts ...coreOption,
+	cfg *Config,
 ) adapter.Instance {
 	switch cloud {
 	case rig.CloudAWS:
-		return newAWSInstance(tsCloudCfg, opts...)
+		return newAWSInstance(tsCloudCfg, cfg)
 	case rig.CloudGCP:
-		return newGCPInstance(tsCloudCfg, opts...)
+		return newGCPInstance(tsCloudCfg, cfg)
 	default:
-		return newGCPInstance(tsCloudCfg, opts...)
+		return newGCPInstance(tsCloudCfg, cfg)
 	}
 }

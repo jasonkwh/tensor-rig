@@ -12,24 +12,13 @@ var _ = adapter.Instance(&instanceGCP{})
 
 type instanceGCP struct {
 	tsCloudCfg adapter.TailscaleCloudConfig
-	core       *core
+	cfg        *Config
 }
 
-func newGCPInstance(
-	tsCloudCfg adapter.TailscaleCloudConfig,
-	opts ...coreOption,
-) adapter.Instance {
-	core := &core{
-		cfg: defaultGCPInstanceConfig(),
-	}
-
-	for _, opt := range opts {
-		opt(core)
-	}
-
+func newGCPInstance(tsCloudCfg adapter.TailscaleCloudConfig, cfg *Config) adapter.Instance {
 	return &instanceGCP{
 		tsCloudCfg: tsCloudCfg,
-		core:       core,
+		cfg:        cfg,
 	}
 }
 
@@ -37,7 +26,7 @@ func (i *instanceGCP) Create(
 	ctx *pulumi.Context,
 	opts ...pulumi.ResourceOption,
 ) (pulumi.Resource, error) {
-	cfg := i.core.cfg
+	cfg := i.cfg
 	scheduling := &compute.InstanceSchedulingArgs{
 		OnHostMaintenance: pulumi.String(cfg.OnHostMaintenance),
 		ProvisioningModel: pulumi.String(cfg.ProvisioningModel),
