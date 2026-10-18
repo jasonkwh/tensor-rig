@@ -95,7 +95,8 @@ func gcpStorageClass(class StorageClass) string {
 func getSoftDeletePolicy(enabled bool) *storage.BucketSoftDeletePolicyArgs {
 	if enabled {
 		return &storage.BucketSoftDeletePolicyArgs{
-			RetentionDurationSeconds: pulumi.Int(7 * 24 * 60 * 60),
+			// The retention duration is set to 7 days.
+			RetentionDurationSeconds: pulumi.Int(7 * 24 * 60 * 60), //nolint:mnd
 		}
 	}
 

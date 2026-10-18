@@ -89,13 +89,13 @@ func (b *storageAWS) Create(
 func awsLifecycleRules(cfg *Config) s3.BucketLifecycleConfigurationRuleArray {
 	rules := make(s3.BucketLifecycleConfigurationRuleArray, 0, len(cfg.LifecycleRules)+1)
 
-	for i, rule := range cfg.LifecycleRules {
+	for index, rule := range cfg.LifecycleRules {
 		if rule.DeleteAfterDays <= 0 {
 			continue
 		}
 
 		rules = append(rules, &s3.BucketLifecycleConfigurationRuleArgs{
-			Id:     pulumi.Sprintf("delete-%d", i),
+			Id:     pulumi.Sprintf("delete-%d", index),
 			Status: pulumi.String("Enabled"),
 			Filter: &s3.BucketLifecycleConfigurationRuleFilterArgs{
 				Prefix: pulumi.String(""),
