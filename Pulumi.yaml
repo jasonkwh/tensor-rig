@@ -42,3 +42,43 @@ config:
     type: boolean
     description: Enable soft delete.
     default: false
+  instanceName:
+    type: string
+    description: Instance name.
+  instanceZone:
+    type: string
+    description: Zone suffix, such as a.
+  instanceMachineType:
+    type: string
+    description: Instance machine type.
+  instanceBootDiskImage:
+    type: string
+    description: Boot disk image or AMI parameter name.
+  instanceBootDiskSizeGb:
+    type: integer
+    description: Boot disk size in GB.
+    default: 100
+  instanceBootDiskType:
+    type: string
+    description: Boot disk type.
+  instanceNetwork:
+    type: string
+    description: VPC network or subnet. Use default for the cloud default network.
+  instanceNicType:
+    type: string
+    description: GCP network interface type.
+  instanceAssignPublicIP:
+    type: boolean
+    description: Assign a public IP address.
+  instanceAcceleratorType:
+    type: string
+    description: GCP guest accelerator type.
+  instanceAcceleratorCount:
+    type: integer
+    description: GCP guest accelerator count.
+  instanceOnHostMaintenance:
+    type: string
+    description: Host maintenance action. GCP uses TERMINATE. AWS spot uses terminate, stop, or hibernate.
+  instanceProvisioningModel:
+    type: string
+    description: Provisioning model. GCP uses SPOT. AWS uses spot.

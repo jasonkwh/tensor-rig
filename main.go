@@ -41,7 +41,23 @@ func main() {
 			return err
 		}
 
-		vm := instance.New(cloud, tsConfig, instance.WithLocation(region))
+		vm := instance.New(cloud, tsConfig, &instance.Config{
+			Name:              cfg.Get("instanceName"),
+			Location:          region,
+			Zone:              cfg.Get("instanceZone"),
+			MachineType:       cfg.Get("instanceMachineType"),
+			BootDiskImage:     cfg.Get("instanceBootDiskImage"),
+			BootDiskSizeGb:    cfg.GetInt("instanceBootDiskSizeGb"),
+			BootDiskType:      cfg.Get("instanceBootDiskType"),
+			Network:           cfg.Get("instanceNetwork"),
+			NicType:           cfg.Get("instanceNicType"),
+			AssignPublicIP:    cfg.GetBool("instanceAssignPublicIP"),
+			AcceleratorType:   cfg.Get("instanceAcceleratorType"),
+			AcceleratorCount:  cfg.GetInt("instanceAcceleratorCount"),
+			OnHostMaintenance: cfg.Get("instanceOnHostMaintenance"),
+			ProvisioningModel: cfg.Get("instanceProvisioningModel"),
+		})
+
 		if _, err = vm.Create(ctx); err != nil {
 			return err
 		}
