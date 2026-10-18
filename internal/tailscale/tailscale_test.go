@@ -6,13 +6,14 @@ import (
 
 func (s *tsTestSuite) TestCloudConfigEmptyKey() {
 	path := s.writeHeadlessEnv("ssid_home=example\npsk_home=secret\nts_auth_key=tskey-auth-fleet\n")
-	_, err := tailscale.New(path)
+	_, err := tailscale.New(tailscale.WithFilePath(path))
 	s.ErrorIs(err, tailscale.ErrNoAuthKey)
 }
 
 func (s *tsTestSuite) TestCloudConfigEmptyFilePath() {
-	_, err := tailscale.New("")
-	s.ErrorIs(err, tailscale.ErrNoFilePath)
+	ts, err := tailscale.New()
+	s.Require().Error(err)
+	s.Equal(tailscale.DefaultFilePath, ts.FilePath())
 }
 
 func (s *tsTestSuite) TestCloudConfigInstallsClient() {

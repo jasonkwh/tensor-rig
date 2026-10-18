@@ -9,24 +9,29 @@ import (
 var _ = adapter.TailscaleCloudConfig(&tsCloudConfig{})
 
 type tsCloudConfig struct {
-	authKey string
+	filePath string
+	authKey  string
 }
 
 func New(
-	filePath string,
+	opts ...tsOptions,
 ) (adapter.TailscaleCloudConfig, error) {
-	if len(filePath) == 0 {
-		return nil, ErrNoFilePath
+	tsc := &tsCloudConfig{
+		filePath: DefaultFilePath,
 	}
 
-	authKey, err := loadTailscaleAuthKey(filePath)
+	for _, opt := range opts {
+		opt(tsc)
+	}
+
+	var err error
+
+	tsc.authKey, err = loadTailscaleAuthKey(tsc.filePath)
 	if err != nil {
-		return nil, err
+		return tsc, err
 	}
 
-	return &tsCloudConfig{
-		authKey: authKey,
-	}, nil
+	return tsc, nil
 }
 
 func (t *tsCloudConfig) Execute(hostname string) (string, error) {
@@ -43,4 +48,8 @@ func (t *tsCloudConfig) Execute(hostname string) (string, error) {
 	}
 
 	return body.String(), nil
+}
+
+func (t *tsCloudConfig) FilePath() string {
+	return t.filePath
 }

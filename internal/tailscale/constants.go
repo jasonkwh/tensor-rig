@@ -1,5 +1,6 @@
 package tailscale
 
 const (
-	authKeyField = "ts_auth_key_rig"
+	DefaultFilePath = "~/.secrets/headless-env"
+	authKeyField    = "ts_auth_key_rig"
 )

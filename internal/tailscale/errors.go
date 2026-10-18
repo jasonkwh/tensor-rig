@@ -6,8 +6,7 @@ import (
 )
 
 var (
-	ErrNoFilePath = errors.New("tailscale: empty file path")
-	ErrNoAuthKey  = errors.New("tailscale: auth key field missing")
+	ErrNoAuthKey = errors.New("tailscale: auth key field missing")
 
 	ErrLoadAuthKey = func(err error) error {
 		return fmt.Errorf("tailscale: load auth key: %w", err)
