@@ -9,22 +9,12 @@ import (
 var _ = adapter.Storage(&storageAWS{})
 
 type storageAWS struct {
-	core *core
+	cfg *Config
 }
 
-func newAWSStorage(
-	opts ...coreOption,
-) adapter.Storage {
-	core := &core{
-		cfg: &Config{},
-	}
-
-	for _, opt := range opts {
-		opt(core)
-	}
-
+func newAWSStorage(cfg *Config) adapter.Storage {
 	return &storageAWS{
-		core: core,
+		cfg: cfg,
 	}
 }
 
@@ -32,20 +22,20 @@ func (b *storageAWS) Create(
 	ctx *pulumi.Context,
 	opts ...pulumi.ResourceOption,
 ) (pulumi.Resource, error) {
-	bucket, err := s3.NewBucket(ctx, b.core.cfg.Name, &s3.BucketArgs{
-		Bucket:       pulumi.String(b.core.cfg.Name),
-		Region:       pulumi.String(b.core.cfg.Location),
-		ForceDestroy: pulumi.Bool(b.core.cfg.ForceDestroy),
-		Tags:         pulumi.StringMap(b.core.cfg.Labels),
+	bucket, err := s3.NewBucket(ctx, b.cfg.Name, &s3.BucketArgs{
+		Bucket:       pulumi.String(b.cfg.Name),
+		Region:       pulumi.String(b.cfg.Location),
+		ForceDestroy: pulumi.Bool(b.cfg.ForceDestroy),
+		Tags:         pulumi.StringMap(b.cfg.Labels),
 	}, opts...)
 	if err != nil {
 		return nil, err
 	}
 
-	if b.core.cfg.VersioningEnabled {
-		_, err = s3.NewBucketVersioning(ctx, b.core.cfg.Name+"-versioning", &s3.BucketVersioningArgs{
+	if b.cfg.VersioningEnabled {
+		_, err = s3.NewBucketVersioning(ctx, b.cfg.Name+"-versioning", &s3.BucketVersioningArgs{
 			Bucket: bucket.Bucket,
-			Region: pulumi.String(b.core.cfg.Location),
+			Region: pulumi.String(b.cfg.Location),
 			VersioningConfiguration: &s3.BucketVersioningVersioningConfigurationArgs{
 				Status: pulumi.String("Enabled"),
 			},
@@ -55,10 +45,10 @@ func (b *storageAWS) Create(
 		}
 	}
 
-	if b.core.cfg.UniformBucketLevelAccess {
-		_, err = s3.NewBucketOwnershipControls(ctx, b.core.cfg.Name+"-ownership", &s3.BucketOwnershipControlsArgs{
+	if b.cfg.UniformBucketLevelAccess {
+		_, err = s3.NewBucketOwnershipControls(ctx, b.cfg.Name+"-ownership", &s3.BucketOwnershipControlsArgs{
 			Bucket: bucket.Bucket,
-			Region: pulumi.String(b.core.cfg.Location),
+			Region: pulumi.String(b.cfg.Location),
 			Rule: &s3.BucketOwnershipControlsRuleArgs{
 				ObjectOwnership: pulumi.String("BucketOwnerEnforced"),
 			},
@@ -68,10 +58,10 @@ func (b *storageAWS) Create(
 		}
 	}
 
-	if rules := awsLifecycleRules(b.core.cfg); len(rules) > 0 {
-		_, err = s3.NewBucketLifecycleConfiguration(ctx, b.core.cfg.Name+"-lifecycle", &s3.BucketLifecycleConfigurationArgs{
+	if rules := awsLifecycleRules(b.cfg); len(rules) > 0 {
+		_, err = s3.NewBucketLifecycleConfiguration(ctx, b.cfg.Name+"-lifecycle", &s3.BucketLifecycleConfigurationArgs{
 			Bucket: bucket.Bucket,
-			Region: pulumi.String(b.core.cfg.Location),
+			Region: pulumi.String(b.cfg.Location),
 			Rules:  rules,
 		}, opts...)
 		if err != nil {
@@ -79,10 +69,10 @@ func (b *storageAWS) Create(
 		}
 	}
 
-	if blocked, ok := awsPublicAccessBlocked(b.core.cfg.PublicAccessPrevention); ok {
-		_, err = s3.NewBucketPublicAccessBlock(ctx, b.core.cfg.Name+"-public-access", &s3.BucketPublicAccessBlockArgs{
+	if blocked, ok := awsPublicAccessBlocked(b.cfg.PublicAccessPrevention); ok {
+		_, err = s3.NewBucketPublicAccessBlock(ctx, b.cfg.Name+"-public-access", &s3.BucketPublicAccessBlockArgs{
 			Bucket:                bucket.Bucket,
-			Region:                pulumi.String(b.core.cfg.Location),
+			Region:                pulumi.String(b.cfg.Location),
 			BlockPublicAcls:       pulumi.Bool(blocked),
 			BlockPublicPolicy:     pulumi.Bool(blocked),
 			IgnorePublicAcls:      pulumi.Bool(blocked),

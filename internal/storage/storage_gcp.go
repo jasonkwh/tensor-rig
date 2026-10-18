@@ -10,22 +10,12 @@ import (
 var _ = adapter.Storage(&storageGCP{})
 
 type storageGCP struct {
-	core *core
+	cfg *Config
 }
 
-func newGCPStorage(
-	opts ...coreOption,
-) adapter.Storage {
-	core := &core{
-		cfg: &Config{},
-	}
-
-	for _, opt := range opts {
-		opt(core)
-	}
-
+func newGCPStorage(cfg *Config) adapter.Storage {
 	return &storageGCP{
-		core: core,
+		cfg: cfg,
 	}
 }
 
@@ -33,19 +23,19 @@ func (b *storageGCP) Create(
 	ctx *pulumi.Context,
 	opts ...pulumi.ResourceOption,
 ) (pulumi.Resource, error) {
-	bucket, err := storage.NewBucket(ctx, b.core.cfg.Name, &storage.BucketArgs{
-		Name:                     pulumi.String(b.core.cfg.Name),
-		Location:                 pulumi.String(b.core.cfg.Location),
-		ForceDestroy:             pulumi.Bool(b.core.cfg.ForceDestroy),
-		UniformBucketLevelAccess: pulumi.Bool(b.core.cfg.UniformBucketLevelAccess),
-		LifecycleRules:           gcpLifecycleRules(b.core.cfg.LifecycleRules),
+	bucket, err := storage.NewBucket(ctx, b.cfg.Name, &storage.BucketArgs{
+		Name:                     pulumi.String(b.cfg.Name),
+		Location:                 pulumi.String(b.cfg.Location),
+		ForceDestroy:             pulumi.Bool(b.cfg.ForceDestroy),
+		UniformBucketLevelAccess: pulumi.Bool(b.cfg.UniformBucketLevelAccess),
+		LifecycleRules:           gcpLifecycleRules(b.cfg.LifecycleRules),
 		Versioning: &storage.BucketVersioningArgs{
-			Enabled: pulumi.Bool(b.core.cfg.VersioningEnabled),
+			Enabled: pulumi.Bool(b.cfg.VersioningEnabled),
 		},
-		PublicAccessPrevention: pulumi.String(string(b.core.cfg.PublicAccessPrevention)),
-		StorageClass:           pulumi.String(gcpStorageClass(b.core.cfg.StorageClass)),
-		Labels:                 pulumi.StringMap(b.core.cfg.Labels),
-		SoftDeletePolicy:       getSoftDeletePolicy(b.core.cfg.SoftDeleteEnabled),
+		PublicAccessPrevention: pulumi.String(string(b.cfg.PublicAccessPrevention)),
+		StorageClass:           pulumi.String(gcpStorageClass(b.cfg.StorageClass)),
+		Labels:                 pulumi.StringMap(b.cfg.Labels),
+		SoftDeletePolicy:       getSoftDeletePolicy(b.cfg.SoftDeleteEnabled),
 	}, opts...)
 	if err != nil {
 		return nil, err
@@ -56,7 +46,7 @@ func (b *storageGCP) Create(
 		return nil, err
 	}
 
-	_, err = storage.NewBucketIAMMember(ctx, b.core.cfg.Name+"-instance", &storage.BucketIAMMemberArgs{
+	_, err = storage.NewBucketIAMMember(ctx, b.cfg.Name+"-instance", &storage.BucketIAMMemberArgs{
 		Bucket: bucket.Name,
 		Role:   pulumi.String("roles/storage.objectAdmin"),
 		Member: pulumi.String(account.Member),

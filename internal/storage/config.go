@@ -2,10 +2,6 @@ package storage
 
 import "github.com/pulumi/pulumi/sdk/v3/go/pulumi"
 
-type core struct {
-	cfg *Config
-}
-
 type Config struct {
 	Name                     string
 	Location                 string

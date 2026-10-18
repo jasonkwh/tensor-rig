@@ -1,7 +1,6 @@
 package main
 
 import (
-	"github.com/jasonkwh/tensor-rig/internal/adapter"
 	"github.com/jasonkwh/tensor-rig/internal/instance"
 	"github.com/jasonkwh/tensor-rig/internal/rig"
 	"github.com/jasonkwh/tensor-rig/internal/storage"
@@ -21,7 +20,18 @@ func main() {
 
 		region := cfg.Get("location")
 
-		store := newStorage(cfg, cloud, region)
+		store := storage.New(cloud, &storage.Config{
+			Name:                     cfg.Get("storageName"),
+			Location:                 region,
+			ForceDestroy:             cfg.GetBool("storageForceDestroy"),
+			LifecycleRules:           []storage.LifecycleRule{{DeleteAfterDays: cfg.GetInt("storageDeleteAfterDays")}},
+			VersioningEnabled:        cfg.GetBool("storageVersioning"),
+			UniformBucketLevelAccess: cfg.GetBool("storageUniformAccess"),
+			PublicAccessPrevention:   storage.PublicAccessPrevention(cfg.Get("storagePublicAccess")),
+			StorageClass:             storage.StorageClass(cfg.Get("storageClass")),
+			SoftDeleteEnabled:        cfg.GetBool("storageSoftDelete"),
+		})
+
 		if _, err = store.Create(ctx); err != nil {
 			return err
 		}
@@ -38,20 +48,4 @@ func main() {
 
 		return nil
 	})
-}
-
-func newStorage(cfg *config.Config, cloud rig.Cloud, region string) adapter.Storage {
-	return storage.New(cloud,
-		storage.WithName(cfg.Get("storageName")),
-		storage.WithLocation(region),
-		storage.WithForceDestroy(cfg.GetBool("storageForceDestroy")),
-		storage.WithVersioning(cfg.GetBool("storageVersioning")),
-		storage.WithUniformBucketLevelAccess(cfg.GetBool("storageUniformAccess")),
-		storage.WithPublicAccessPrevention(storage.PublicAccessPrevention(cfg.Get("storagePublicAccess"))),
-		storage.WithStorageClass(storage.StorageClass(cfg.Get("storageClass"))),
-		storage.WithSoftDelete(cfg.GetBool("storageSoftDelete")),
-		storage.WithLifecycleRules([]storage.LifecycleRule{{
-			DeleteAfterDays: cfg.GetInt("storageDeleteAfterDays"),
-		}}),
-	)
 }

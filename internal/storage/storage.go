@@ -7,14 +7,14 @@ import (
 
 func New(
 	cloud rig.Cloud,
-	opts ...coreOption,
+	cfg *Config,
 ) adapter.Storage {
 	switch cloud {
 	case rig.CloudAWS:
-		return newAWSStorage(opts...)
+		return newAWSStorage(cfg)
 	case rig.CloudGCP:
-		return newGCPStorage(opts...)
+		return newGCPStorage(cfg)
 	default:
-		return newGCPStorage(opts...)
+		return newGCPStorage(cfg)
 	}
 }
