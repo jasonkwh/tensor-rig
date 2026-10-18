@@ -60,6 +60,7 @@ func (b *storageGCP) Create(
 
 func gcpLifecycleRules(rules []LifecycleRule) storage.BucketLifecycleRuleArray {
 	out := make(storage.BucketLifecycleRuleArray, 0, len(rules))
+
 	for _, rule := range rules {
 		if rule.DeleteAfterDays <= 0 {
 			continue
@@ -74,6 +75,7 @@ func gcpLifecycleRules(rules []LifecycleRule) storage.BucketLifecycleRuleArray {
 			},
 		})
 	}
+
 	return out
 }
 
