@@ -48,6 +48,7 @@ config:
   instanceZone:
     type: string
     description: Zone suffix, such as a.
+    default: a
   instanceMachineType:
     type: string
     description: Instance machine type.
@@ -66,16 +67,16 @@ config:
     description: VPC network or subnet. Use default for the cloud default network.
   instanceNicType:
     type: string
-    description: GCP network interface type.
+    description: GCP only. Network interface type, such as VIRTIO_NET. AWS ignores this.
   instanceAssignPublicIP:
     type: boolean
     description: Assign a public IP address.
   instanceAcceleratorType:
     type: string
-    description: GCP guest accelerator type.
+    description: GCP only. Guest accelerator type, such as nvidia-tesla-t4. AWS ignores this.
   instanceAcceleratorCount:
     type: integer
-    description: GCP guest accelerator count.
+    description: GCP only. Guest accelerator count. AWS ignores this.
   instanceOnHostMaintenance:
     type: string
     description: Host maintenance action. GCP uses TERMINATE. AWS spot uses terminate, stop, or hibernate.
