@@ -37,31 +37,14 @@ func (i *instanceGCP) Create(
 		scheduling.Preemptible = pulumi.Bool(true)
 	}
 
-	nic := &compute.InstanceNetworkInterfaceArgs{
-		Network: pulumi.String(cfg.Network),
-		NicType: pulumi.String(cfg.NicType),
-	}
-
-	if cfg.AssignPublicIP {
-		nic.AccessConfigs = compute.InstanceNetworkInterfaceAccessConfigArray{
-			&compute.InstanceNetworkInterfaceAccessConfigArgs{},
-		}
-	}
-
 	metadata, err := i.gcpInstanceMetadata(cfg)
 	if err != nil {
 		return nil, err
 	}
 
-	if cfg.RestrictPublicIngress {
-		if err = i.gcpRestrictPublicIngress(ctx, cfg, opts...); err != nil {
-			return nil, err
-		}
-	}
-
-	tags := pulumi.StringArray{}
-	if cfg.RestrictPublicIngress {
-		tags = append(tags, pulumi.String(gcpNetworkTag(cfg)))
+	nic, tags, err := i.gcpInstanceNetworking(ctx, cfg, opts...)
+	if err != nil {
+		return nil, err
 	}
 
 	instanceArgs := &compute.InstanceArgs{
