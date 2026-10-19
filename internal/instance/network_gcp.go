@@ -19,7 +19,7 @@ func (i *instanceGCP) gcpRestrictPublicIngress(
 		Name:      pulumi.String(cfg.Name + "-allow-tailscale-udp"),
 		Network:   gcpNetwork(cfg),
 		Direction: pulumi.String("INGRESS"),
-		Priority:  pulumi.Int(900),
+		Priority:  pulumi.Int(900), //nolint:mnd
 		Allows: compute.FirewallAllowArray{
 			&compute.FirewallAllowArgs{
 				Protocol: pulumi.String("udp"),
@@ -40,7 +40,7 @@ func (i *instanceGCP) gcpRestrictPublicIngress(
 		Name:      pulumi.String(cfg.Name + "-deny-public-tcp"),
 		Network:   gcpNetwork(cfg),
 		Direction: pulumi.String("INGRESS"),
-		Priority:  pulumi.Int(1000),
+		Priority:  pulumi.Int(1000), //nolint:mnd
 		Denies: compute.FirewallDenyArray{
 			&compute.FirewallDenyArgs{
 				Protocol: pulumi.String("tcp"),
@@ -60,7 +60,7 @@ func (i *instanceGCP) gcpRestrictPublicIngress(
 		Name:      pulumi.String(cfg.Name + "-deny-public-udp"),
 		Network:   gcpNetwork(cfg),
 		Direction: pulumi.String("INGRESS"),
-		Priority:  pulumi.Int(1100),
+		Priority:  pulumi.Int(1100), //nolint:mnd
 		Denies: compute.FirewallDenyArray{
 			&compute.FirewallDenyArgs{
 				Protocol: pulumi.String("udp"),

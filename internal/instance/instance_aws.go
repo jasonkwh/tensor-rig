@@ -54,6 +54,7 @@ func (i *instanceAWS) Create(
 	}
 
 	var securityGroup *ec2.SecurityGroup
+
 	if cfg.RestrictPublicIngress {
 		vpcID, err := awsVpcID(ctx, cfg)
 		if err != nil {
