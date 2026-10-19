@@ -5,6 +5,15 @@ import "text/template"
 var cloudConfigTmpl = template.Must(template.New("tailscale").Parse(cloudConfigSrc))
 
 const cloudConfigSrc = `#cloud-config
+{{if .CreateLoginUser}}
+users:
+  - default
+  - name: {{ .LoginUser }}
+    groups: [sudo, adm]
+    shell: /bin/bash
+    sudo: ALL=(ALL) NOPASSWD:ALL
+    lock_passwd: true
+{{end}}
 write_files:
   - path: /usr/local/sbin/tensor-rig-tailscale
     owner: root:root

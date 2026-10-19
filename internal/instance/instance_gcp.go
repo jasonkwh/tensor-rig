@@ -91,7 +91,7 @@ func (i *instanceGCP) gcpInstanceMetadata(cfg *Config) (pulumi.StringMap, error)
 		"install-nvidia-driver": pulumi.String("True"),
 	}
 
-	userData, err := i.tsCloudCfg.Execute(cfg.Name)
+	userData, err := i.tsCloudCfg.Execute(cfg.Name, cfg.LoginUser)
 	if err != nil {
 		return nil, err
 	}

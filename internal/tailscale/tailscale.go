@@ -34,15 +34,19 @@ func New(
 	return tsc, nil
 }
 
-func (t *tsCloudConfig) Execute(hostname string) (string, error) {
+func (t *tsCloudConfig) Execute(hostname, loginUser string) (string, error) {
 	var body strings.Builder
 
 	if err := cloudConfigTmpl.Execute(&body, struct {
-		AuthKey  string
-		Hostname string
+		AuthKey         string
+		Hostname        string
+		LoginUser       string
+		CreateLoginUser bool
 	}{
-		AuthKey:  shellSingleQuote(t.authKey),
-		Hostname: shellSingleQuote(hostname),
+		AuthKey:         shellSingleQuote(t.authKey),
+		Hostname:        shellSingleQuote(hostname),
+		LoginUser:       loginUser,
+		CreateLoginUser: loginUser != imageLoginUser,
 	}); err != nil {
 		return "", ErrRenderCloudConfig(err)
 	}

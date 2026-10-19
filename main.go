@@ -58,6 +58,7 @@ func main() {
 			AcceleratorCount:      cfg.GetInt("instanceAcceleratorCount"),
 			OnHostMaintenance:     cfg.Get("instanceOnHostMaintenance"),
 			ProvisioningModel:     cfg.Get("instanceProvisioningModel"),
+			LoginUser:             cfg.Get("instanceLoginUser"),
 		})
 
 		if _, err = vm.Create(ctx, pulumi.DependsOn([]pulumi.Resource{bucket})); err != nil {

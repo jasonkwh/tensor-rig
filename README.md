@@ -37,7 +37,7 @@ The machine is cheap and replaceable. Put datasets and checkpoints in the bucket
 
 ## Tailscale auth key
 
-Create a reusable auth key in the [Tailscale admin console](https://login.tailscale.com/admin/settings/keys). A reusable key lets a replacement instance join after spot preemption. An ephemeral key removes the node once the machine goes offline.
+Create a reusable auth key in the [Tailscale admin console](https://login.tailscale.com/admin/settings/keys). A reusable key lets a replacement instance join after spot preemption. An ephemeral key removes the node once the machine goes offline. Leave **tags** empty on the key so the node is owned by your user and matches default SSH policies (`autogroup:self`).
 
 Save it in `~/.secrets/headless-env`:
 
@@ -74,7 +74,9 @@ An empty `cloud` value deploys to GCP.
 
 ## Connect
 
-After boot, the instance joins your tailnet under `instanceName`. Both committed stacks use `tensor-rig-instance-au`:
+After boot, the instance joins your tailnet under `instanceName`. Both committed stacks use `tensor-rig-instance-au`.
+
+First boot adds your **`instanceLoginUser`** login account (default **`jasonkwh`** in `Pulumi.yaml`) with passwordless sudo—the PyTorch images still ship their own OS user, but you SSH as this one. `tailscale ssh` defaults to your **local** username, so keep `instanceLoginUser` in sync with your workstation if you want to connect without a user prefix:
 
 ```bash
 tailscale ssh tensor-rig-instance-au

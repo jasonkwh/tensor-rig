@@ -22,10 +22,11 @@ func (s *tsTestSuite) TestCloudConfigEmptyFilePath() {
 }
 
 func (s *tsTestSuite) TestCloudConfigInstallsClient() {
-	got := s.renderTailscaleCloudConfig("tskey-auth-example", "tensor-rig-instance-au")
+	got := s.renderTailscaleCloudConfig("tskey-auth-example", "tensor-rig-instance-au", "")
 
 	for _, want := range []string{
 		"#cloud-config",
+		"name: jasonkwh",
 		"https://tailscale.com/install.sh",
 		"--auth-key='tskey-auth-example'",
 		"--ssh",
@@ -38,7 +39,7 @@ func (s *tsTestSuite) TestCloudConfigInstallsClient() {
 }
 
 func (s *tsTestSuite) TestTailscaleCloudConfigQuotesAuthKey() {
-	got := s.renderTailscaleCloudConfig("key'injected", "box")
+	got := s.renderTailscaleCloudConfig("key'injected", "box", "")
 	s.Contains(got, `'key'\''injected'`)
 }
 
@@ -57,7 +58,35 @@ func (s *tsTestSuite) TestLoadAuthKeyExpandsHomePath() {
 	s.Require().NoError(err)
 	s.Equal(tailscale.DefaultFilePath, ts.FilePath())
 
-	got, err := ts.Execute("rig")
+	got, err := ts.Execute("rig", "")
 	s.Require().NoError(err)
 	s.Contains(got, "tskey-auth-home")
+}
+
+func (s *tsTestSuite) TestCloudConfigSkipsLoginUserWhenImageUser() {
+	got := s.renderTailscaleCloudConfig("tskey-auth-example", "tensor-rig-instance-au", "ubuntu")
+
+	s.NotContains(got, "users:")
+}
+
+func (s *tsTestSuite) TestCloudConfigCreatesLoginUser() {
+	got := s.renderTailscaleCloudConfig("tskey-auth-example", "tensor-rig-instance-au", "jasonkwh")
+
+	for _, want := range []string{
+		"users:",
+		"name: jasonkwh",
+		"groups: [sudo, adm]",
+		"sudo: ALL=(ALL) NOPASSWD:ALL",
+	} {
+		s.Contains(got, want)
+	}
+}
+
+func (s *tsTestSuite) TestCloudConfigRejectsInvalidLoginUser() {
+	path := s.writeHeadlessEnv("ts_auth_key_rig=tskey-auth-example\n")
+	ts, err := tailscale.New(tailscale.WithFilePath(path))
+	s.Require().NoError(err)
+
+	_, err = ts.Execute("box", "bad user")
+	s.ErrorIs(err, tailscale.ErrInvalidLoginUser)
 }

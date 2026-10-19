@@ -17,14 +17,14 @@ func TestSuite(t *testing.T) {
 	suite.Run(t, new(tsTestSuite))
 }
 
-func (s *tsTestSuite) renderTailscaleCloudConfig(authKey, hostname string) string {
+func (s *tsTestSuite) renderTailscaleCloudConfig(authKey, hostname, loginUser string) string {
 	s.T().Helper()
 
 	path := s.writeHeadlessEnv("ssid_home=example\npsk_home=secret\nts_auth_key=tskey-auth-fleet\nts_auth_key_rig=" + authKey + "\n")
 	ts, err := tailscale.New(tailscale.WithFilePath(path))
 	s.Require().NoError(err)
 
-	got, err := ts.Execute(hostname)
+	got, err := ts.Execute(hostname, loginUser)
 	s.Require().NoError(err)
 
 	return got
