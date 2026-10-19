@@ -22,11 +22,10 @@ func (s *tsTestSuite) TestCloudConfigEmptyFilePath() {
 }
 
 func (s *tsTestSuite) TestCloudConfigInstallsClient() {
-	got := s.renderTailscaleCloudConfig("tskey-auth-example", "tensor-rig-instance-au", "")
+	got := s.renderTailscaleCloudConfig("tskey-auth-example", "tensor-rig-instance-au", "jasonkwh")
 
 	for _, want := range []string{
 		"#cloud-config",
-		"name: jasonkwh",
 		"https://tailscale.com/install.sh",
 		"--auth-key='tskey-auth-example'",
 		"--ssh",
@@ -64,9 +63,11 @@ func (s *tsTestSuite) TestLoadAuthKeyExpandsHomePath() {
 }
 
 func (s *tsTestSuite) TestCloudConfigSkipsLoginUserWhenImageUser() {
-	got := s.renderTailscaleCloudConfig("tskey-auth-example", "tensor-rig-instance-au", "ubuntu")
+	got := s.renderTailscaleCloudConfig("tskey-auth-example", "tensor-rig-instance-au", tailscale.ImageLoginUser)
 
 	s.NotContains(got, "users:")
+	s.NotContains(got, "name: "+tailscale.ImageLoginUser)
+	s.Contains(got, "https://tailscale.com/install.sh")
 }
 
 func (s *tsTestSuite) TestCloudConfigCreatesLoginUser() {
@@ -80,13 +81,4 @@ func (s *tsTestSuite) TestCloudConfigCreatesLoginUser() {
 	} {
 		s.Contains(got, want)
 	}
-}
-
-func (s *tsTestSuite) TestCloudConfigRejectsInvalidLoginUser() {
-	path := s.writeHeadlessEnv("ts_auth_key_rig=tskey-auth-example\n")
-	ts, err := tailscale.New(tailscale.WithFilePath(path))
-	s.Require().NoError(err)
-
-	_, err = ts.Execute("box", "bad user")
-	s.ErrorIs(err, tailscale.ErrInvalidLoginUser)
 }

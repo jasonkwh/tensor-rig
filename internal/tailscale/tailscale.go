@@ -46,7 +46,7 @@ func (t *tsCloudConfig) Execute(hostname, loginUser string) (string, error) {
 		AuthKey:         shellSingleQuote(t.authKey),
 		Hostname:        shellSingleQuote(hostname),
 		LoginUser:       loginUser,
-		CreateLoginUser: loginUser != imageLoginUser,
+		CreateLoginUser: loginUser != ImageLoginUser,
 	}); err != nil {
 		return "", ErrRenderCloudConfig(err)
 	}
