@@ -9,10 +9,14 @@ import (
 	"github.com/pulumi/pulumi/sdk/v3/go/pulumi"
 )
 
-var gcpPublicIngressSourceRanges = pulumi.StringArray{
-	pulumi.String("0.0.0.0/0"),
-	pulumi.String("::/0"),
-}
+var (
+	gcpPublicIngressSourceRanges = pulumi.StringArray{
+		pulumi.String("0.0.0.0/0"),
+	}
+	gcpPublicIngressSourceRangesIPv6 = pulumi.StringArray{
+		pulumi.String("::/0"),
+	}
+)
 
 type gcpIngressFirewallRule struct {
 	suffix   string
@@ -95,10 +99,18 @@ func (i *instanceGCP) gcpRestrictPublicIngress(
 	}
 
 	for _, rule := range rules {
-		if err := gcpNewIngressFirewall(ctx,
-			fmt.Sprintf("%s-%s", cfg.Name, rule.suffix),
-			network, targetTags, rule, opts...); err != nil {
-			return err
+		for _, src := range []struct {
+			nameSuffix string
+			ranges     pulumi.StringArray
+		}{
+			{"", gcpPublicIngressSourceRanges},
+			{"-ipv6", gcpPublicIngressSourceRangesIPv6},
+		} {
+			if err := gcpNewIngressFirewall(ctx,
+				fmt.Sprintf("%s-%s%s", cfg.Name, rule.suffix, src.nameSuffix),
+				network, targetTags, rule, src.ranges, opts...); err != nil {
+				return err
+			}
 		}
 	}
 
@@ -111,6 +123,7 @@ func gcpNewIngressFirewall(
 	network pulumi.StringInput,
 	targetTags pulumi.StringArray,
 	rule gcpIngressFirewallRule,
+	sourceRanges pulumi.StringArray,
 	opts ...pulumi.ResourceOption,
 ) error {
 	_, err := compute.NewFirewall(ctx, name, &compute.FirewallArgs{
@@ -120,7 +133,7 @@ func gcpNewIngressFirewall(
 		Priority:     pulumi.Int(rule.priority),
 		Allows:       rule.allows,
 		Denies:       rule.denies,
-		SourceRanges: gcpPublicIngressSourceRanges,
+		SourceRanges: sourceRanges,
 		TargetTags:   targetTags,
 	}, opts...)
 
