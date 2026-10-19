@@ -2,6 +2,7 @@ package tailscale
 
 import (
 	"os"
+	"path/filepath"
 	"strings"
 )
 
@@ -10,7 +11,12 @@ func shellSingleQuote(value string) string {
 }
 
 func loadTailscaleAuthKey(filePath string) (string, error) {
-	content, err := os.ReadFile(filePath)
+	path, err := expandHomePath(filePath)
+	if err != nil {
+		return "", ErrLoadAuthKey(err)
+	}
+
+	content, err := os.ReadFile(path)
 	if err != nil {
 		return "", ErrLoadAuthKey(err)
 	}
@@ -25,4 +31,17 @@ func loadTailscaleAuthKey(filePath string) (string, error) {
 	}
 
 	return "", ErrNoAuthKey
+}
+
+func expandHomePath(path string) (string, error) {
+	if !strings.HasPrefix(path, "~/") {
+		return path, nil
+	}
+
+	home, err := os.UserHomeDir()
+	if err != nil {
+		return "", err
+	}
+
+	return filepath.Join(home, strings.TrimPrefix(path, "~/")), nil
 }

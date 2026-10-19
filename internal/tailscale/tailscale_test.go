@@ -1,6 +1,9 @@
 package tailscale_test
 
 import (
+	"os"
+	"path/filepath"
+
 	"github.com/jasonkwh/tensor-rig/internal/tailscale"
 )
 
@@ -11,6 +14,8 @@ func (s *tsTestSuite) TestCloudConfigEmptyKey() {
 }
 
 func (s *tsTestSuite) TestCloudConfigEmptyFilePath() {
+	s.T().Setenv("HOME", s.T().TempDir())
+
 	ts, err := tailscale.New()
 	s.Require().Error(err)
 	s.Equal(tailscale.DefaultFilePath, ts.FilePath())
@@ -35,4 +40,24 @@ func (s *tsTestSuite) TestCloudConfigInstallsClient() {
 func (s *tsTestSuite) TestTailscaleCloudConfigQuotesAuthKey() {
 	got := s.renderTailscaleCloudConfig("key'injected", "box")
 	s.Contains(got, `'key'\''injected'`)
+}
+
+func (s *tsTestSuite) TestLoadAuthKeyExpandsHomePath() {
+	home := s.T().TempDir()
+	s.T().Setenv("HOME", home)
+
+	secretsDir := filepath.Join(home, ".secrets")
+	s.Require().NoError(os.Mkdir(secretsDir, 0o700))
+
+	path := filepath.Join(secretsDir, "headless-env")
+	err := os.WriteFile(path, []byte("ts_auth_key_rig=tskey-auth-home\n"), 0o600)
+	s.Require().NoError(err)
+
+	ts, err := tailscale.New()
+	s.Require().NoError(err)
+	s.Equal(tailscale.DefaultFilePath, ts.FilePath())
+
+	got, err := ts.Execute("rig")
+	s.Require().NoError(err)
+	s.Contains(got, "tskey-auth-home")
 }
