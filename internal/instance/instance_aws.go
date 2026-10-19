@@ -38,7 +38,7 @@ func (i *instanceAWS) Create(
 		return nil, err
 	}
 
-	subnetID, err := awsSubnetID(ctx, cfg)
+	net, err := i.awsInstanceNetworking(ctx, cfg, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -53,22 +53,8 @@ func (i *instanceAWS) Create(
 		return nil, err
 	}
 
-	var securityGroup *ec2.SecurityGroup
-
-	if cfg.RestrictPublicIngress {
-		vpcID, err := awsVpcID(ctx, cfg)
-		if err != nil {
-			return nil, err
-		}
-
-		securityGroup, err = i.awsRestrictPublicIngress(ctx, cfg, vpcID, opts...)
-		if err != nil {
-			return nil, err
-		}
-	}
-
 	instance, err := ec2.NewInstance(ctx, cfg.Name, awsInstanceArgs(
-		cfg, imageID, subnetID, userData, profile, securityGroup,
+		cfg, imageID, net, userData, profile,
 	), opts...)
 	if err != nil {
 		return nil, err
@@ -91,34 +77,6 @@ func awsImageID(ctx *pulumi.Context, cfg *Config) (string, error) {
 	}
 
 	return param.Value, nil
-}
-
-func awsSubnetID(ctx *pulumi.Context, cfg *Config) (string, error) {
-	if cfg.Network != "" && !strings.EqualFold(cfg.Network, "default") {
-		return cfg.Network, nil
-	}
-
-	vpc, err := ec2.LookupVpc(ctx, &ec2.LookupVpcArgs{
-		Default: pulumi.BoolRef(true),
-		Region:  &cfg.Location,
-	})
-	if err != nil {
-		return "", err
-	}
-
-	zone := cfg.Location + cfg.Zone
-
-	subnet, err := ec2.LookupSubnet(ctx, &ec2.LookupSubnetArgs{
-		AvailabilityZone: &zone,
-		DefaultForAz:     pulumi.BoolRef(true),
-		Region:           &cfg.Location,
-		VpcId:            &vpc.Id,
-	})
-	if err != nil {
-		return "", err
-	}
-
-	return subnet.Id, nil
 }
 
 func awsInstanceProfile(
@@ -154,16 +112,15 @@ func awsInstanceProfile(
 func awsInstanceArgs(
 	cfg *Config,
 	imageID string,
-	subnetID string,
+	net awsInstanceNetwork,
 	userData string,
 	profile *iam.InstanceProfile,
-	securityGroup *ec2.SecurityGroup,
 ) *ec2.InstanceArgs {
 	args := &ec2.InstanceArgs{
 		Ami:                      pulumi.String(imageID),
 		InstanceType:             pulumi.String(cfg.MachineType),
 		Region:                   pulumi.String(cfg.Location),
-		SubnetId:                 pulumi.String(subnetID),
+		SubnetId:                 pulumi.String(net.subnetID),
 		AssociatePublicIpAddress: pulumi.Bool(cfg.AssignPublicIP),
 		IamInstanceProfile:       profile.Name,
 		RootBlockDevice: &ec2.InstanceRootBlockDeviceArgs{
@@ -180,8 +137,8 @@ func awsInstanceArgs(
 		args.UserData = pulumi.String(userData)
 	}
 
-	if securityGroup != nil {
-		args.VpcSecurityGroupIds = pulumi.StringArray{securityGroup.ID()}
+	if net.securityGroup != nil {
+		args.VpcSecurityGroupIds = pulumi.StringArray{net.securityGroup.ID()}
 	}
 
 	if strings.EqualFold(cfg.ProvisioningModel, "spot") {
