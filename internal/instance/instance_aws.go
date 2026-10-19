@@ -53,8 +53,21 @@ func (i *instanceAWS) Create(
 		return nil, err
 	}
 
+	var securityGroup *ec2.SecurityGroup
+	if cfg.RestrictPublicIngress {
+		vpcID, err := awsVpcID(ctx, cfg)
+		if err != nil {
+			return nil, err
+		}
+
+		securityGroup, err = i.awsRestrictPublicIngress(ctx, cfg, vpcID, opts...)
+		if err != nil {
+			return nil, err
+		}
+	}
+
 	instance, err := ec2.NewInstance(ctx, cfg.Name, awsInstanceArgs(
-		cfg, imageID, subnetID, userData, profile,
+		cfg, imageID, subnetID, userData, profile, securityGroup,
 	), opts...)
 	if err != nil {
 		return nil, err
@@ -143,6 +156,7 @@ func awsInstanceArgs(
 	subnetID string,
 	userData string,
 	profile *iam.InstanceProfile,
+	securityGroup *ec2.SecurityGroup,
 ) *ec2.InstanceArgs {
 	args := &ec2.InstanceArgs{
 		Ami:                      pulumi.String(imageID),
@@ -163,6 +177,10 @@ func awsInstanceArgs(
 
 	if userData != "" {
 		args.UserData = pulumi.String(userData)
+	}
+
+	if securityGroup != nil {
+		args.VpcSecurityGroupIds = pulumi.StringArray{securityGroup.ID()}
 	}
 
 	if strings.EqualFold(cfg.ProvisioningModel, "spot") {

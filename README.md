@@ -88,6 +88,16 @@ aws s3 cp dataset.tar.gz s3://tensor-rig-storage-au/ --region ap-southeast-2
 
 Spot capacity can disappear. Run `pulumi up` again to request a new machine. Move anything you need to keep into the bucket first: the boot disk is deleted with the instance, and objects older than `storageDeleteAfterDays` are removed.
 
+## Public IP hardening
+
+When `instanceRestrictPublicIngress` is `true` (the default), the stack limits what the public IP accepts. Connect with `tailscale ssh`, not SSH to the cloud address.
+
+**GCP** adds firewall rules on the instance network tag: allow UDP 41641 (Tailscale), deny all other TCP and UDP from the internet. That overrides default rules such as `default-allow-ssh`.
+
+**AWS** attaches a security group with no public TCP ingress and UDP 41641 open for Tailscale direct paths.
+
+Set `instanceRestrictPublicIngress` to `false` if you need inbound TCP on the public IP (for example a temporary Jupyter listener).
+
 ## Configuration
 
 Keys and defaults are defined in `Pulumi.yaml`. Stack values live in `Pulumi.gcp.yaml` and `Pulumi.aws.yaml`. Edit the stack file or set a key, then run `pulumi up`:

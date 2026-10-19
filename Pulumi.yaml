@@ -69,6 +69,10 @@ config:
   instanceAssignPublicIP:
     type: boolean
     description: Assign a public IP address.
+  instanceRestrictPublicIngress:
+    type: boolean
+    description: Block inbound TCP from the public internet and allow Tailscale UDP 41641 only. Use Tailscale SSH to connect.
+    default: true
   instanceAcceleratorType:
     type: string
     description: GCP only. Guest accelerator type, such as nvidia-tesla-t4. AWS ignores this.

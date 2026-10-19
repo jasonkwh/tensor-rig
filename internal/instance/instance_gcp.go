@@ -53,6 +53,17 @@ func (i *instanceGCP) Create(
 		return nil, err
 	}
 
+	if cfg.RestrictPublicIngress {
+		if err = i.gcpRestrictPublicIngress(ctx, cfg, opts...); err != nil {
+			return nil, err
+		}
+	}
+
+	tags := pulumi.StringArray{}
+	if cfg.RestrictPublicIngress {
+		tags = append(tags, pulumi.String(gcpNetworkTag(cfg)))
+	}
+
 	instanceArgs := &compute.InstanceArgs{
 		Name:        pulumi.String(cfg.Name),
 		MachineType: pulumi.String(cfg.MachineType),
@@ -72,6 +83,7 @@ func (i *instanceGCP) Create(
 		},
 		Scheduling: scheduling,
 		Metadata:   metadata,
+		Tags:       tags,
 	}
 
 	if cfg.AcceleratorCount > 0 {

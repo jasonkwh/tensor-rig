@@ -10,8 +10,9 @@ type Config struct {
 	BootDiskType      string
 	Network           string
 	NicType           string // GCP only.
-	AssignPublicIP    bool
-	AcceleratorType   string // GCP only.
+	AssignPublicIP          bool
+	RestrictPublicIngress   bool
+	AcceleratorType         string // GCP only.
 	AcceleratorCount  int    // GCP only.
 	OnHostMaintenance string
 	ProvisioningModel string
