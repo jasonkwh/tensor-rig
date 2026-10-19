@@ -32,7 +32,8 @@ func main() {
 			SoftDeleteEnabled:        cfg.GetBool("storageSoftDelete"),
 		})
 
-		if _, err = store.Create(ctx); err != nil {
+		bucket, err := store.Create(ctx)
+		if err != nil {
 			return err
 		}
 
@@ -58,7 +59,7 @@ func main() {
 			ProvisioningModel: cfg.Get("instanceProvisioningModel"),
 		})
 
-		if _, err = vm.Create(ctx); err != nil {
+		if _, err = vm.Create(ctx, pulumi.DependsOn([]pulumi.Resource{bucket})); err != nil {
 			return err
 		}
 
