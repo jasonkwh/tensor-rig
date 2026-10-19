@@ -6,6 +6,7 @@
 
 <p align="center">
   <a href="https://github.com/jasonkwh/tensor-rig/actions/workflows/test.yml"><img src="https://img.shields.io/github/actions/workflow/status/jasonkwh/tensor-rig/test.yml?label=test" alt="test"></a>
+  <a href="https://github.com/jasonkwh/tensor-rig/actions/workflows/lint.yml"><img src="https://img.shields.io/github/actions/workflow/status/jasonkwh/tensor-rig/lint.yml?label=lint" alt="lint"></a>
   <a href="LICENSE"><img src="https://img.shields.io/badge/license-MIT-blue.svg" alt="MIT License"></a>
 </p>
 
@@ -50,10 +51,10 @@ Deploy reads `ts_auth_key_rig` from that file and renders it into the instance c
 
 The repo includes two stacks:
 
-| Stack | Region | Machine | GPU | Boot image |
-| --- | --- | --- | --- | --- |
-| `gcp` | `australia-southeast1` | `n1-standard-4` | 1× NVIDIA T4 | GCP PyTorch 2.9, CUDA 12.9, Ubuntu 24.04 |
-| `aws` | `ap-southeast-2` | `g4dn.xlarge` | 1× NVIDIA T4 | AWS Deep Learning AMI, PyTorch 2.14, Ubuntu 26.04 |
+| Stack | Region                 | Machine         | GPU          | Boot image                                        |
+| ----- | ---------------------- | --------------- | ------------ | ------------------------------------------------- |
+| `gcp` | `australia-southeast1` | `n1-standard-4` | 1× NVIDIA T4 | GCP PyTorch 2.9, CUDA 12.9, Ubuntu 24.04          |
+| `aws` | `ap-southeast-2`       | `g4dn.xlarge`   | 1× NVIDIA T4 | AWS Deep Learning AMI, PyTorch 2.14, Ubuntu 26.04 |
 
 Log in, select a stack, and apply it:
 
