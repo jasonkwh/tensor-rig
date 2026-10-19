@@ -8,8 +8,6 @@ import (
 	"github.com/pulumi/pulumi/sdk/v3/go/pulumi"
 )
 
-const tailscaleUDPPort = 41641
-
 func (i *instanceGCP) gcpRestrictPublicIngress(
 	ctx *pulumi.Context,
 	cfg *Config,
