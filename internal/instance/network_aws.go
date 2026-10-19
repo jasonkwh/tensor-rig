@@ -41,7 +41,10 @@ func (i *instanceAWS) awsInstanceNetworking(
 	return out, err
 }
 
-func awsNetworkPlacement(ctx *pulumi.Context, cfg *Config) (vpcID, subnetID string, err error) {
+func awsNetworkPlacement(
+	ctx *pulumi.Context,
+	cfg *Config,
+) (string, string, error) {
 	if cfg.Network != "" && !strings.EqualFold(cfg.Network, "default") {
 		subnet, lookupErr := ec2.LookupSubnet(ctx, &ec2.LookupSubnetArgs{
 			Id:     &cfg.Network,
