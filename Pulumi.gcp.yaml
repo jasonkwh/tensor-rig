@@ -13,7 +13,6 @@ config:
   tensor-rig:instanceMachineType: n1-standard-4
   tensor-rig:instanceBootDiskImage: projects/deeplearning-platform-release/global/images/family/pytorch-2-9-cu129-ubuntu-2404-nvidia-580
   tensor-rig:instanceBootDiskType: pd-balanced
-  tensor-rig:instanceNetwork: default
   tensor-rig:instanceNicType: VIRTIO_NET
   tensor-rig:instanceAssignPublicIP: true
   tensor-rig:instanceAcceleratorType: nvidia-tesla-t4

@@ -62,6 +62,7 @@ config:
   instanceNetwork:
     type: string
     description: VPC network or subnet. Use default for the cloud default network.
+    default: default
   instanceNicType:
     type: string
     description: GCP only. Network interface type, such as VIRTIO_NET. AWS ignores this.
@@ -76,7 +77,7 @@ config:
     description: GCP only. Guest accelerator count. AWS ignores this.
   instanceOnHostMaintenance:
     type: string
-    description: Host maintenance action. GCP uses TERMINATE. AWS spot uses terminate, stop, or hibernate.
+    description: Host maintenance action. GCP uses TERMINATE. AWS spot uses TERMINATE, STOP, or HIBERNATE.
   instanceProvisioningModel:
     type: string
-    description: Provisioning model. GCP uses SPOT. AWS uses spot.
+    description: Provisioning model. Use SPOT.

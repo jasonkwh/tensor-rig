@@ -18,6 +18,9 @@ type instanceAWS struct {
 }
 
 func newAWSInstance(tsCloudCfg adapter.TailscaleCloudConfig, cfg *Config) adapter.Instance {
+	cfg.OnHostMaintenance = strings.ToLower(cfg.OnHostMaintenance)
+	cfg.ProvisioningModel = strings.ToLower(cfg.ProvisioningModel)
+
 	return &instanceAWS{
 		tsCloudCfg: tsCloudCfg,
 		cfg:        cfg,
@@ -166,20 +169,11 @@ func awsInstanceArgs(
 		args.InstanceMarketOptions = &ec2.InstanceInstanceMarketOptionsArgs{
 			MarketType: pulumi.String("spot"),
 			SpotOptions: &ec2.InstanceInstanceMarketOptionsSpotOptionsArgs{
-				InstanceInterruptionBehavior: pulumi.String(awsInterruptionBehavior(cfg.OnHostMaintenance)),
+				InstanceInterruptionBehavior: pulumi.String(cfg.OnHostMaintenance),
 				SpotInstanceType:             pulumi.String("one-time"),
 			},
 		}
 	}
 
 	return args
-}
-
-func awsInterruptionBehavior(action string) string {
-	switch strings.ToLower(action) {
-	case "stop", "hibernate", "terminate":
-		return strings.ToLower(action)
-	default:
-		return "terminate"
-	}
 }
