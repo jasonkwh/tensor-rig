@@ -1,9 +1,4 @@
-.PHONY: default up lint test-unit
-
-default: up
-
-up:
-	pulumi up
+.PHONY: lint test-unit
 
 lint:
 	golangci-lint run -c .golangci.yml
