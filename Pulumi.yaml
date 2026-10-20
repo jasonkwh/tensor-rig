@@ -91,4 +91,5 @@ config:
     description: Host maintenance action. GCP uses TERMINATE. AWS spot uses TERMINATE, STOP, or HIBERNATE.
   instanceProvisioningModel:
     type: string
-    description: Provisioning model. Use SPOT.
+    description: Provisioning model. SPOT by default.
+    default: SPOT

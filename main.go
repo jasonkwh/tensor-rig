@@ -57,7 +57,7 @@ func main() {
 			AcceleratorType:       cfg.Get("instanceAcceleratorType"),
 			AcceleratorCount:      cfg.GetInt("instanceAcceleratorCount"),
 			OnHostMaintenance:     cfg.Get("instanceOnHostMaintenance"),
-			ProvisioningModel:     cfg.Get("instanceProvisioningModel"),
+			ProvisioningModel:     instance.ProvisioningModel(cfg.Get("instanceProvisioningModel")),
 			LoginUser:             cfg.Get("instanceLoginUser"),
 		})
 

@@ -15,6 +15,17 @@ type Config struct {
 	AcceleratorType       string // GCP only.
 	AcceleratorCount      int    // GCP only.
 	OnHostMaintenance     string
-	ProvisioningModel     string
+	ProvisioningModel     ProvisioningModel
 	LoginUser             string
+}
+
+type ProvisioningModel string
+
+const (
+	ProvisioningModelSpot     ProvisioningModel = "SPOT"
+	ProvisioningModelStandard ProvisioningModel = "STANDARD"
+)
+
+func (p ProvisioningModel) IsSpot() bool {
+	return p == ProvisioningModelSpot
 }

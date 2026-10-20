@@ -19,7 +19,6 @@ type instanceAWS struct {
 
 func newAWSInstance(tsCloudCfg adapter.TailscaleCloudConfig, cfg *Config) adapter.Instance {
 	cfg.OnHostMaintenance = strings.ToLower(cfg.OnHostMaintenance)
-	cfg.ProvisioningModel = strings.ToLower(cfg.ProvisioningModel)
 
 	return &instanceAWS{
 		tsCloudCfg: tsCloudCfg,
@@ -141,7 +140,7 @@ func awsInstanceArgs(
 		args.VpcSecurityGroupIds = pulumi.StringArray{net.securityGroup.ID()}
 	}
 
-	if strings.EqualFold(cfg.ProvisioningModel, "spot") {
+	if cfg.ProvisioningModel.IsSpot() {
 		args.InstanceMarketOptions = &ec2.InstanceInstanceMarketOptionsArgs{
 			MarketType: pulumi.String("spot"),
 			SpotOptions: &ec2.InstanceInstanceMarketOptionsSpotOptionsArgs{

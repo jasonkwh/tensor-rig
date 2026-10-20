@@ -32,7 +32,7 @@ func (i *instanceGCP) Create(
 		ProvisioningModel: pulumi.String(cfg.ProvisioningModel),
 	}
 
-	if cfg.ProvisioningModel == "SPOT" {
+	if cfg.ProvisioningModel.IsSpot() {
 		scheduling.AutomaticRestart = pulumi.Bool(false)
 		scheduling.Preemptible = pulumi.Bool(true)
 	}
