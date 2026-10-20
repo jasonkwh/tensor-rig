@@ -70,6 +70,7 @@ config:
   instanceNicType:
     type: string
     description: GCP only. Network interface type, such as VIRTIO_NET. AWS ignores this.
+    default: VIRTIO_NET
   instanceAssignPublicIP:
     type: boolean
     description: Assign a public IP address.
@@ -80,9 +81,11 @@ config:
   instanceAcceleratorType:
     type: string
     description: GCP only. Guest accelerator type, such as nvidia-tesla-t4. AWS ignores this.
+    default: ""
   instanceAcceleratorCount:
     type: integer
     description: GCP only. Guest accelerator count. AWS ignores this.
+    default: 0
   instanceOnHostMaintenance:
     type: string
     description: Host maintenance action. GCP uses TERMINATE. AWS spot uses TERMINATE, STOP, or HIBERNATE.
