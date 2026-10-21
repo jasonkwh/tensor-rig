@@ -1,10 +1,10 @@
 package main
 
 import (
+	"github.com/jasonkwh/tensor-rig/internal/cloudinit"
 	"github.com/jasonkwh/tensor-rig/internal/instance"
 	"github.com/jasonkwh/tensor-rig/internal/rig"
 	"github.com/jasonkwh/tensor-rig/internal/storage"
-	"github.com/jasonkwh/tensor-rig/internal/tailscale"
 	"github.com/pulumi/pulumi/sdk/v3/go/pulumi"
 	"github.com/pulumi/pulumi/sdk/v3/go/pulumi/config"
 )
@@ -37,9 +37,9 @@ func main() {
 			return err
 		}
 
-		tsConfig, err := tailscale.New(
-			tailscale.WithLoginUser(cfg.Get("tailscaleLoginUser")),
-			tailscale.WithHostname(cfg.Get("tailscaleHostname")))
+		tsConfig, err := cloudinit.New(
+			cloudinit.WithLoginUser(cfg.Get("cloudInitLoginUser")),
+			cloudinit.WithHostname(cfg.Get("cloudInitHostname")))
 		if err != nil {
 			return err
 		}

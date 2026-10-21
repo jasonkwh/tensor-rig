@@ -1,4 +1,4 @@
-package tailscale
+package cloudinit
 
 import (
 	"strings"
@@ -6,7 +6,7 @@ import (
 	"github.com/jasonkwh/tensor-rig/internal/adapter"
 )
 
-var _ = adapter.TailscaleCloudConfig(&tsCloudConfig{})
+var _ = adapter.CloudInit(&tsCloudConfig{})
 
 type tsCloudConfig struct {
 	filePath  string
@@ -17,7 +17,7 @@ type tsCloudConfig struct {
 
 func New(
 	opts ...tsOptions,
-) (adapter.TailscaleCloudConfig, error) {
+) (adapter.CloudInit, error) {
 	tsc := &tsCloudConfig{
 		filePath:  DefaultFilePath,
 		hostname:  defaultHostname,

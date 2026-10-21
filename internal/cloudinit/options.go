@@ -1,4 +1,4 @@
-package tailscale
+package cloudinit
 
 type tsOptions func(*tsCloudConfig)
 

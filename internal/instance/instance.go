@@ -7,7 +7,7 @@ import (
 
 func New(
 	cloud rig.Cloud,
-	tsCloudCfg adapter.TailscaleCloudConfig,
+	tsCloudCfg adapter.CloudInit,
 	cfg *Config,
 ) adapter.Instance {
 	switch cloud {

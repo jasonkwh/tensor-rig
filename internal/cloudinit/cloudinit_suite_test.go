@@ -1,27 +1,27 @@
-package tailscale_test
+package cloudinit_test
 
 import (
 	"os"
 	"path/filepath"
 	"testing"
 
-	"github.com/jasonkwh/tensor-rig/internal/tailscale"
+	"github.com/jasonkwh/tensor-rig/internal/cloudinit"
 	"github.com/stretchr/testify/suite"
 )
 
-type tsTestSuite struct {
+type cloudInitSuite struct {
 	suite.Suite
 }
 
-func TestSuite(t *testing.T) {
-	suite.Run(t, new(tsTestSuite))
+func TestCloudInitSuite(t *testing.T) {
+	suite.Run(t, new(cloudInitSuite))
 }
 
-func (s *tsTestSuite) renderTailscaleCloudConfig(authKey, loginUser string) string {
+func (s *cloudInitSuite) renderCloudInitConfig(authKey, loginUser string) string {
 	s.T().Helper()
 
 	path := s.writeHeadlessEnv("ssid_home=example\npsk_home=secret\nts_auth_key=tskey-auth-fleet\nts_auth_key_rig=" + authKey + "\n")
-	ts, err := tailscale.New(tailscale.WithFilePath(path), tailscale.WithLoginUser(loginUser))
+	ts, err := cloudinit.New(cloudinit.WithFilePath(path), cloudinit.WithLoginUser(loginUser))
 	s.Require().NoError(err)
 
 	got, err := ts.Execute()
@@ -30,7 +30,7 @@ func (s *tsTestSuite) renderTailscaleCloudConfig(authKey, loginUser string) stri
 	return got
 }
 
-func (s *tsTestSuite) writeHeadlessEnv(body string) string {
+func (s *cloudInitSuite) writeHeadlessEnv(body string) string {
 	s.T().Helper()
 
 	path := filepath.Join(s.T().TempDir(), "headless-env")

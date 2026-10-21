@@ -13,11 +13,11 @@ import (
 var _ = adapter.Instance(&instanceAWS{})
 
 type instanceAWS struct {
-	tsCloudCfg adapter.TailscaleCloudConfig
+	tsCloudCfg adapter.CloudInit
 	cfg        *Config
 }
 
-func newAWSInstance(tsCloudCfg adapter.TailscaleCloudConfig, cfg *Config) adapter.Instance {
+func newAWSInstance(tsCloudCfg adapter.CloudInit, cfg *Config) adapter.Instance {
 	cfg.OnHostMaintenance = strings.ToLower(cfg.OnHostMaintenance)
 
 	return &instanceAWS{

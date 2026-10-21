@@ -1,8 +1,8 @@
-package tailscale
+package cloudinit
 
 import "text/template"
 
-var cloudConfigTmpl = template.Must(template.New("tailscale").Parse(cloudConfigSrc))
+var cloudConfigTmpl = template.Must(template.New("cloudinit").Parse(cloudConfigSrc))
 
 const cloudConfigSrc = `#cloud-config
 {{if .CreateLoginUser}}
@@ -49,7 +49,43 @@ write_files:
 
       [Install]
       WantedBy=multi-user.target
+  - path: /usr/local/sbin/tensor-rig-node-exporter
+    owner: root:root
+    permissions: "0700"
+    content: |
+      #!/bin/bash
+      set -euo pipefail
+      if [[ -x /usr/local/bin/node_exporter ]]; then
+        exit 0
+      fi
+      version=1.9.0
+      arch=amd64
+      tmpdir=$(mktemp -d)
+      trap 'rm -rf "${tmpdir}"' EXIT
+      curl -fsSL "https://github.com/prometheus/node_exporter/releases/download/v${version}/node_exporter-${version}.linux-${arch}.tar.gz" \
+        | tar -xzf - -C "${tmpdir}"
+      install -o root -g root -m 0755 \
+        "${tmpdir}/node_exporter-${version}.linux-${arch}/node_exporter" \
+        /usr/local/bin/node_exporter
+  - path: /etc/systemd/system/tensor-rig-node-exporter.service
+    owner: root:root
+    permissions: "0644"
+    content: |
+      [Unit]
+      Description=Prometheus node exporter
+      After=network-online.target
+      Wants=network-online.target
+
+      [Service]
+      Type=simple
+      ExecStartPre=/usr/local/sbin/tensor-rig-node-exporter
+      ExecStart=/usr/local/bin/node_exporter --web.listen-address=:9100
+      Restart=on-failure
+
+      [Install]
+      WantedBy=multi-user.target
 runcmd:
   - [systemctl, daemon-reload]
   - [systemctl, enable, --now, tensor-rig-tailscale.service]
+  - [systemctl, enable, --now, tensor-rig-node-exporter.service]
 `

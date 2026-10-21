@@ -11,11 +11,11 @@ import (
 var _ = adapter.Instance(&instanceGCP{})
 
 type instanceGCP struct {
-	tsCloudCfg adapter.TailscaleCloudConfig
+	tsCloudCfg adapter.CloudInit
 	cfg        *Config
 }
 
-func newGCPInstance(tsCloudCfg adapter.TailscaleCloudConfig, cfg *Config) adapter.Instance {
+func newGCPInstance(tsCloudCfg adapter.CloudInit, cfg *Config) adapter.Instance {
 	return &instanceGCP{
 		tsCloudCfg: tsCloudCfg,
 		cfg:        cfg,

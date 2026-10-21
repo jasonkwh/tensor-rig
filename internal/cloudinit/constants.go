@@ -1,4 +1,4 @@
-package tailscale
+package cloudinit
 
 const (
 	DefaultFilePath  = "~/.secrets/headless-env"

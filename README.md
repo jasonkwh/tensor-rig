@@ -22,7 +22,7 @@ The machine is cheap and replaceable. Put datasets and checkpoints in the bucket
 
 **GPU instance.** A spot virtual machine. The committed GCP stack is an `n1-standard-4` with one NVIDIA T4. The AWS stack is a `g4dn.xlarge`. Both boot a vendor PyTorch image.
 
-**Tailscale SSH.** Cloud-init installs Tailscale and runs `tailscale up --ssh` with hostname **`tailscaleHostname`** (default **`jasonkwh-tensor-rig`** in `Pulumi.yaml`). **`instanceName`** is only the cloud resource name (EC2/GCE), not the tailnet name.
+**Cloud-init.** First boot user-data joins the machine to Tailscale (`tailscale up --ssh` with hostname **`cloudInitHostname`**, default **`jasonkwh-tensor-rig`** in `Pulumi.yaml`) and starts Prometheus **node_exporter** on port **9100** (reachable on the tailnet, not on the public IP). **`instanceName`** is only the cloud resource name (EC2/GCE), not the tailnet name.
 
 **Bucket credentials on the instance.** On GCP the default Compute Engine service account receives `roles/storage.objectAdmin` on the bucket. On AWS the instance profile can read and write S3.
 
@@ -74,9 +74,11 @@ An empty `cloud` value deploys to GCP.
 
 ## Connect
 
-After boot, the node appears on your tailnet as **`tailscaleHostname`**. Both committed stacks still use **`instanceName`** `tensor-rig-instance-au` in the cloud console.
+After boot, the node appears on your tailnet as **`cloudInitHostname`**. Both committed stacks still use **`instanceName`** `tensor-rig-instance-au` in the cloud console.
 
-First boot adds your **`tailscaleLoginUser`** login account (default **`jasonkwh`** in `Pulumi.yaml`) with passwordless sudo—the PyTorch images still ship their own OS user, but you SSH as this one. `tailscale ssh` defaults to your **local** username, so keep `tailscaleLoginUser` in sync with your workstation if you want to connect without a user prefix:
+First boot adds your **`cloudInitLoginUser`** login account (default **`jasonkwh`** in `Pulumi.yaml`) with passwordless sudo—the PyTorch images still ship their own OS user, but you SSH as this one. `tailscale ssh` defaults to your **local** username, so keep `cloudInitLoginUser` in sync with your workstation if you want to connect without a user prefix:
+
+Prometheus on your tailnet can scrape `http://<cloudInitHostname>:9100/metrics` (or the node’s Tailscale IP).
 
 ```bash
 tailscale ssh jasonkwh-tensor-rig
@@ -106,8 +108,8 @@ Set `instanceRestrictPublicIngress` to `false` if you need inbound TCP on the pu
 Keys and defaults are defined in `Pulumi.yaml`. Stack values live in `Pulumi.gcp.yaml` and `Pulumi.aws.yaml`. Edit the stack file or set a key, then run `pulumi up`:
 
 ```bash
-pulumi config set tailscaleHostname my-gpu-rig
-pulumi config set tailscaleLoginUser jasonkwh
+pulumi config set cloudInitHostname my-gpu-rig
+pulumi config set cloudInitLoginUser jasonkwh
 pulumi config set instanceMachineType n1-standard-8
 pulumi config set storageDeleteAfterDays 30
 ```
