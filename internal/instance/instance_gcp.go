@@ -37,7 +37,7 @@ func (i *instanceGCP) Create(
 		scheduling.Preemptible = pulumi.Bool(true)
 	}
 
-	metadata, err := i.gcpInstanceMetadata(cfg)
+	metadata, err := i.gcpInstanceMetadata()
 	if err != nil {
 		return nil, err
 	}
@@ -86,7 +86,7 @@ func (i *instanceGCP) Create(
 	return instance, nil
 }
 
-func (i *instanceGCP) gcpInstanceMetadata(cfg *Config) (pulumi.StringMap, error) {
+func (i *instanceGCP) gcpInstanceMetadata() (pulumi.StringMap, error) {
 	metadata := pulumi.StringMap{
 		"install-nvidia-driver": pulumi.String("True"),
 	}
