@@ -62,7 +62,9 @@ write_files:
       arch=amd64
       tmpdir=$(mktemp -d)
       trap 'rm -rf "${tmpdir}"' EXIT
-      curl -fsSL "https://github.com/prometheus/node_exporter/releases/download/v${version}/node_exporter-${version}.linux-${arch}.tar.gz" \
+      base="https://github.com/prometheus/node_exporter/releases/download"
+      url="${base}/v${version}/node_exporter-${version}.linux-${arch}.tar.gz"
+      curl -fsSL "${url}" \
         | tar -xzf - -C "${tmpdir}"
       install -o root -g root -m 0755 \
         "${tmpdir}/node_exporter-${version}.linux-${arch}/node_exporter" \
