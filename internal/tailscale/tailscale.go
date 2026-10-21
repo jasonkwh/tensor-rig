@@ -9,15 +9,19 @@ import (
 var _ = adapter.TailscaleCloudConfig(&tsCloudConfig{})
 
 type tsCloudConfig struct {
-	filePath string
-	authKey  string
+	filePath  string
+	authKey   string
+	hostname  string
+	loginUser string
 }
 
 func New(
 	opts ...tsOptions,
 ) (adapter.TailscaleCloudConfig, error) {
 	tsc := &tsCloudConfig{
-		filePath: DefaultFilePath,
+		filePath:  DefaultFilePath,
+		hostname:  defaultHostname,
+		loginUser: DefaultLoginUser,
 	}
 
 	for _, opt := range opts {
@@ -34,7 +38,7 @@ func New(
 	return tsc, nil
 }
 
-func (t *tsCloudConfig) Execute(hostname, loginUser string) (string, error) {
+func (t *tsCloudConfig) Execute() (string, error) {
 	var body strings.Builder
 
 	if err := cloudConfigTmpl.Execute(&body, struct {
@@ -44,9 +48,9 @@ func (t *tsCloudConfig) Execute(hostname, loginUser string) (string, error) {
 		CreateLoginUser bool
 	}{
 		AuthKey:         shellSingleQuote(t.authKey),
-		Hostname:        shellSingleQuote(hostname),
-		LoginUser:       loginUser,
-		CreateLoginUser: loginUser != ImageLoginUser,
+		Hostname:        shellSingleQuote(t.hostname),
+		LoginUser:       t.loginUser,
+		CreateLoginUser: t.loginUser != DefaultLoginUser,
 	}); err != nil {
 		return "", ErrRenderCloudConfig(err)
 	}

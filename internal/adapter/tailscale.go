@@ -1,10 +1,6 @@
 package adapter
 
 type TailscaleCloudConfig interface {
-	Execute(
-		hostname string,
-		loginUser string,
-	) (string, error)
-
+	Execute() (string, error)
 	FilePath() string
 }

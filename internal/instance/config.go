@@ -16,7 +16,6 @@ type Config struct {
 	AcceleratorCount      int    // GCP only.
 	OnHostMaintenance     string
 	ProvisioningModel     ProvisioningModel
-	LoginUser             string
 }
 
 type ProvisioningModel string

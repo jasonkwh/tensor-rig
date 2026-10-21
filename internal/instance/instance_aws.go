@@ -42,7 +42,7 @@ func (i *instanceAWS) Create(
 		return nil, err
 	}
 
-	userData, err := i.tsCloudCfg.Execute(cfg.Name, cfg.LoginUser)
+	userData, err := i.tsCloudCfg.Execute()
 	if err != nil {
 		return nil, err
 	}

@@ -7,3 +7,15 @@ func WithFilePath(filePath string) tsOptions {
 		c.filePath = filePath
 	}
 }
+
+func WithHostname(hostname string) tsOptions {
+	return func(c *tsCloudConfig) {
+		c.hostname = hostname
+	}
+}
+
+func WithLoginUser(loginUser string) tsOptions {
+	return func(c *tsCloudConfig) {
+		c.loginUser = loginUser
+	}
+}

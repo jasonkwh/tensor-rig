@@ -37,7 +37,9 @@ func main() {
 			return err
 		}
 
-		tsConfig, err := tailscale.New()
+		tsConfig, err := tailscale.New(
+			tailscale.WithLoginUser(cfg.Get("tailscaleLoginUser")),
+			tailscale.WithHostname(cfg.Get("tailscaleHostname")))
 		if err != nil {
 			return err
 		}
@@ -58,7 +60,6 @@ func main() {
 			AcceleratorCount:      cfg.GetInt("instanceAcceleratorCount"),
 			OnHostMaintenance:     cfg.Get("instanceOnHostMaintenance"),
 			ProvisioningModel:     instance.ProvisioningModel(cfg.Get("instanceProvisioningModel")),
-			LoginUser:             cfg.Get("instanceLoginUser"),
 		})
 
 		if _, err = vm.Create(ctx, pulumi.DependsOn([]pulumi.Resource{bucket})); err != nil {

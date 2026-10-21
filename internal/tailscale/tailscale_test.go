@@ -22,14 +22,13 @@ func (s *tsTestSuite) TestCloudConfigEmptyFilePath() {
 }
 
 func (s *tsTestSuite) TestCloudConfigInstallsClient() {
-	got := s.renderTailscaleCloudConfig("tskey-auth-example", "tensor-rig-instance-au", "jasonkwh")
+	got := s.renderTailscaleCloudConfig("tskey-auth-example", "jasonkwh")
 
 	for _, want := range []string{
 		"#cloud-config",
 		"https://tailscale.com/install.sh",
 		"--auth-key='tskey-auth-example'",
 		"--ssh",
-		"--hostname='tensor-rig-instance-au'",
 		"tensor-rig-tailscale.service",
 		"systemctl",
 	} {
@@ -38,7 +37,7 @@ func (s *tsTestSuite) TestCloudConfigInstallsClient() {
 }
 
 func (s *tsTestSuite) TestTailscaleCloudConfigQuotesAuthKey() {
-	got := s.renderTailscaleCloudConfig("key'injected", "box", "")
+	got := s.renderTailscaleCloudConfig("key'injected", "")
 	s.Contains(got, `'key'\''injected'`)
 }
 
@@ -57,21 +56,21 @@ func (s *tsTestSuite) TestLoadAuthKeyExpandsHomePath() {
 	s.Require().NoError(err)
 	s.Equal(tailscale.DefaultFilePath, ts.FilePath())
 
-	got, err := ts.Execute("rig", "")
+	got, err := ts.Execute()
 	s.Require().NoError(err)
 	s.Contains(got, "tskey-auth-home")
 }
 
-func (s *tsTestSuite) TestCloudConfigSkipsLoginUserWhenImageUser() {
-	got := s.renderTailscaleCloudConfig("tskey-auth-example", "tensor-rig-instance-au", tailscale.ImageLoginUser)
+func (s *tsTestSuite) TestCloudConfigSkipsLoginUserWhenDefaultUser() {
+	got := s.renderTailscaleCloudConfig("tskey-auth-example", tailscale.DefaultLoginUser)
 
 	s.NotContains(got, "users:")
-	s.NotContains(got, "name: "+tailscale.ImageLoginUser)
+	s.NotContains(got, "name: "+tailscale.DefaultLoginUser)
 	s.Contains(got, "https://tailscale.com/install.sh")
 }
 
 func (s *tsTestSuite) TestCloudConfigCreatesLoginUser() {
-	got := s.renderTailscaleCloudConfig("tskey-auth-example", "tensor-rig-instance-au", "jasonkwh")
+	got := s.renderTailscaleCloudConfig("tskey-auth-example", "jasonkwh")
 
 	for _, want := range []string{
 		"users:",

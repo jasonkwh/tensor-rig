@@ -22,7 +22,7 @@ The machine is cheap and replaceable. Put datasets and checkpoints in the bucket
 
 **GPU instance.** A spot virtual machine. The committed GCP stack is an `n1-standard-4` with one NVIDIA T4. The AWS stack is a `g4dn.xlarge`. Both boot a vendor PyTorch image.
 
-**Tailscale SSH.** Cloud-init installs Tailscale and runs `tailscale up --ssh`, using the instance name as the hostname.
+**Tailscale SSH.** Cloud-init installs Tailscale and runs `tailscale up --ssh` with hostname **`tailscaleHostname`** (default **`jasonkwh-tensor-rig`** in `Pulumi.yaml`). **`instanceName`** is only the cloud resource name (EC2/GCE), not the tailnet name.
 
 **Bucket credentials on the instance.** On GCP the default Compute Engine service account receives `roles/storage.objectAdmin` on the bucket. On AWS the instance profile can read and write S3.
 
@@ -74,12 +74,12 @@ An empty `cloud` value deploys to GCP.
 
 ## Connect
 
-After boot, the instance joins your tailnet under `instanceName`. Both committed stacks use `tensor-rig-instance-au`.
+After boot, the node appears on your tailnet as **`tailscaleHostname`**. Both committed stacks still use **`instanceName`** `tensor-rig-instance-au` in the cloud console.
 
-First boot adds your **`instanceLoginUser`** login account (default **`jasonkwh`** in `Pulumi.yaml`) with passwordless sudo—the PyTorch images still ship their own OS user, but you SSH as this one. `tailscale ssh` defaults to your **local** username, so keep `instanceLoginUser` in sync with your workstation if you want to connect without a user prefix:
+First boot adds your **`tailscaleLoginUser`** login account (default **`jasonkwh`** in `Pulumi.yaml`) with passwordless sudo—the PyTorch images still ship their own OS user, but you SSH as this one. `tailscale ssh` defaults to your **local** username, so keep `tailscaleLoginUser` in sync with your workstation if you want to connect without a user prefix:
 
 ```bash
-tailscale ssh tensor-rig-instance-au
+tailscale ssh jasonkwh-tensor-rig
 ```
 
 Copy data to the bucket from your machine or from the instance:
@@ -106,6 +106,8 @@ Set `instanceRestrictPublicIngress` to `false` if you need inbound TCP on the pu
 Keys and defaults are defined in `Pulumi.yaml`. Stack values live in `Pulumi.gcp.yaml` and `Pulumi.aws.yaml`. Edit the stack file or set a key, then run `pulumi up`:
 
 ```bash
+pulumi config set tailscaleHostname my-gpu-rig
+pulumi config set tailscaleLoginUser jasonkwh
 pulumi config set instanceMachineType n1-standard-8
 pulumi config set storageDeleteAfterDays 30
 ```

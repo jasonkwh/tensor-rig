@@ -8,6 +8,14 @@ config:
   location:
     type: string
     description: Location for the bucket and instance.
+  tailscaleLoginUser:
+    type: string
+    description: Login account cloud-init adds on first boot (sudo). Not the image OS user—set this to match your workstation username for tailscale ssh without user@host.
+    default: jasonkwh
+  tailscaleHostname:
+    type: string
+    description: Hostname for the tailscale instance.
+    default: jasonkwh-tensor-rig
   storageName:
     type: string
     description: Bucket name.
@@ -42,10 +50,6 @@ config:
   instanceName:
     type: string
     description: Instance name.
-  instanceLoginUser:
-    type: string
-    description: Login account cloud-init adds on first boot (sudo). Not the image OS user—set this to match your workstation username for tailscale ssh without user@host.
-    default: jasonkwh
   instanceZone:
     type: string
     description: Zone suffix, such as a.
