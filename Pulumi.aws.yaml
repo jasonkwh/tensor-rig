@@ -11,7 +11,7 @@ config:
   tensor-rig:storageSoftDelete: "false"
   tensor-rig:instanceName: tensor-rig-instance-au
   tensor-rig:instanceZone: b
-  tensor-rig:instanceMachineType: g4dn.xlarge
+  tensor-rig:instanceMachineType: g4dn.2xlarge
   tensor-rig:instanceBootDiskImage: /aws/service/deeplearning/ami/x86_64/oss-nvidia-driver-gpu-pytorch-2.14-ubuntu-26.04/latest/ami-id
   tensor-rig:instanceBootDiskType: gp3
   tensor-rig:instanceAssignPublicIP: "true"
