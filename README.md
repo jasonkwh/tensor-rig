@@ -20,7 +20,7 @@ The machine is cheap and replaceable. Put datasets and checkpoints in the bucket
 
 **Bucket.** A GCS or S3 bucket in the configured region. Public access is blocked. Objects are deleted after `storageDeleteAfterDays` (seven by default).
 
-**GPU instance.** A spot virtual machine. The committed GCP stack is an `n1-standard-4` with one NVIDIA T4. The AWS stack is a `g4dn.xlarge`. Both boot a vendor PyTorch image.
+**GPU instance.** A spot virtual machine. The committed GCP stack is an `n1-standard-8` with one NVIDIA T4. The AWS stack is a `g4dn.2xlarge`. Both boot a vendor PyTorch image.
 
 **Cloud-init.** First boot user-data joins the machine to Tailscale (`tailscale up --ssh` with hostname **`cloudInitHostname`**, default **`jasonkwh-tensor-rig`** in `Pulumi.yaml`) and starts Prometheus **node_exporter** on port **9100** (reachable on the tailnet, not on the public IP). **`instanceName`** is only the cloud resource name (EC2/GCE), not the tailnet name.
 
@@ -53,8 +53,8 @@ The repo includes two stacks:
 
 | Stack | Region                 | Machine         | GPU          | Boot image                                        |
 | ----- | ---------------------- | --------------- | ------------ | ------------------------------------------------- |
-| `gcp` | `australia-southeast1` | `n1-standard-4` | 1× NVIDIA T4 | GCP PyTorch 2.9, CUDA 12.9, Ubuntu 24.04          |
-| `aws` | `ap-southeast-2`       | `g4dn.xlarge`   | 1× NVIDIA T4 | AWS Deep Learning AMI, PyTorch 2.14, Ubuntu 26.04 |
+| `gcp` | `australia-southeast1` | `n1-standard-8` | 1× NVIDIA T4 | GCP PyTorch 2.9, CUDA 12.9, Ubuntu 24.04          |
+| `aws` | `ap-southeast-2`       | `g4dn.2xlarge`  | 1× NVIDIA T4 | AWS Deep Learning AMI, PyTorch 2.14, Ubuntu 26.04 |
 
 Log in, select a stack, and apply it:
 
@@ -92,6 +92,30 @@ aws s3 cp dataset.tar.gz s3://tensor-rig-storage-au/ --region ap-southeast-2
 ```
 
 Spot capacity can disappear. Run `pulumi up` again to request a new machine. Move anything you need to keep into the bucket first: the boot disk is deleted with the instance, and objects older than `storageDeleteAfterDays` are removed.
+
+## Training artifacts
+
+Training output lives on the boot disk, which is deleted with the spot instance. Push it to the bucket while the job runs, not after it finishes:
+
+```bash
+scripts/sync-artifacts.sh gs://tensor-rig-storage-au/deepmario/rig
+scripts/sync-artifacts.sh s3://tensor-rig-storage-au/deepmario/rig
+```
+
+One script covers both clouds: the destination scheme selects `gcloud storage rsync` or `aws s3 sync`. It pushes `mario_checkpoints`, `mario_best_model`, `mario_logs` and `mario_videos` from the training checkout every five minutes (`-i`), skipping directories that do not exist yet. The instance service account or instance profile already has write access, so there is no credential setup.
+
+Restore on a replacement instance, then resume:
+
+```bash
+scripts/pull-artifacts.sh gs://tensor-rig-storage-au/deepmario/rig
+ENCODER=cnn make train
+```
+
+`pull-artifacts.sh` skips remote prefixes that are not in the bucket yet, and takes `-v` to include videos. Keep `ENCODER` and `FRAME_STACK` identical to the run that produced the checkpoints: they decide the model name, so a mismatch resumes from nothing.
+
+Neither script passes a delete flag, so `make clean` on the instance cannot wipe the bucket copy. Bucket objects still expire after `storageDeleteAfterDays`.
+
+`sync-artifacts.sh` only makes sense on the instance, where the training output lives. `pull-artifacts.sh` runs there when restoring before a resume, and also works from your workstation if you want the artifacts locally: pass `-r` to point at that checkout, and the copy authenticates as you rather than as the instance role. Both stay in this repo so the training repo does not need to know the bucket exists.
 
 ## Public IP hardening
 

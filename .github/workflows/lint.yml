@@ -28,3 +28,15 @@ jobs:
         uses: golangci/golangci-lint-action@v9
         with:
           version: v2.14.0
+
+  shellcheck:
+    name: shell linting
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v7
+
+      - name: Run shellcheck
+        run: shellcheck --shell=bash --severity=style scripts/*.sh
+
