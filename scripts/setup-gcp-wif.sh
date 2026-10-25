@@ -13,7 +13,7 @@ readonly DEFAULT_PROVIDER="tensor-rig"
 readonly SA_ROLES=(roles/compute.admin roles/storage.admin roles/iam.serviceAccountUser)
 
 usage() {
-  cat <<'EOF'
+  cat <<EOF
 Set up Workload Identity Federation so GitHub Actions can deploy the gcp
 stack without a service account key sitting in the repository.
 
