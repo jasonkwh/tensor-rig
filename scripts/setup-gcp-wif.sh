@@ -180,22 +180,6 @@ if gcloud iam workload-identity-pools providers describe "${DEFAULT_PROVIDER}" \
   --project="${PROJECT}" --location=global \
   --workload-identity-pool="${DEFAULT_POOL}" >/dev/null 2>&1; then
   log "  exists"
-  CURRENT_CONDITION=$(gcloud iam workload-identity-pools providers describe "${DEFAULT_PROVIDER}" \
-    --project="${PROJECT}" --location=global \
-    --workload-identity-pool="${DEFAULT_POOL}" \
-    --format='value(attributeCondition)')
-
-  if [[ "${CURRENT_CONDITION}" != "${ATTRIBUTE_CONDITION}" ]]; then
-    log "  condition differs, updating"
-    gcloud iam workload-identity-pools providers update-oidc "${DEFAULT_PROVIDER}" \
-      --project="${PROJECT}" \
-      --location=global \
-      --workload-identity-pool="${DEFAULT_POOL}" \
-      --attribute-mapping="${ATTRIBUTE_MAPPING}" \
-      --attribute-condition="${ATTRIBUTE_CONDITION}"
-  else
-    log "  condition already current"
-  fi
 else
   gcloud iam workload-identity-pools providers create-oidc "${DEFAULT_PROVIDER}" \
     --project="${PROJECT}" \
