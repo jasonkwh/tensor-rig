@@ -54,6 +54,25 @@ die() {
   exit 1
 }
 
+# A freshly created service account is not visible to IAM policy changes for
+# up to a minute, so bindings fail with "does not exist" right after creation.
+retry() {
+  local max="$1"
+  local attempt=1
+
+  shift
+
+  until "$@"; do
+    if [[ "${attempt}" -ge "${max}" ]]; then
+      return 1
+    fi
+
+    log "  retrying in 15s (${attempt}/${max})" >&2
+    attempt=$((attempt + 1))
+    sleep 15
+  done
+}
+
 PROJECT="${DEFAULT_PROJECT}"
 REPO="${DEFAULT_REPO}"
 ENVIRONMENT="${DEFAULT_ENVIRONMENT}"
@@ -99,6 +118,10 @@ log "resolving project ${PROJECT}"
 PROJECT_ID=$(gcloud projects describe "${PROJECT}" --format='value(projectId)')
 PROJECT_NUMBER=$(gcloud projects describe "${PROJECT}" --format='value(projectNumber)')
 
+# Every later gcloud call wants the project id; a few reject the number
+# outright. The number is only used to build the workload identity paths.
+PROJECT="${PROJECT_ID}"
+
 # STS exchanges the GitHub token and IAM Credentials mints the impersonated
 # access token; without these the workflow fails at the auth step, not here.
 readonly REQUIRED_APIS=(
@@ -133,7 +156,7 @@ fi
 
 for role in "${SA_ROLES[@]}"; do
   log "grant ${role}"
-  gcloud projects add-iam-policy-binding "${PROJECT}" \
+  retry 8 gcloud projects add-iam-policy-binding "${PROJECT}" \
     --member="serviceAccount:${SA_EMAIL}" \
     --role="${role}" \
     --condition=None \
@@ -170,7 +193,7 @@ else
 fi
 
 log "allow the pool to impersonate ${SA_NAME}"
-gcloud iam service-accounts add-iam-policy-binding "${SA_EMAIL}" \
+retry 8 gcloud iam service-accounts add-iam-policy-binding "${SA_EMAIL}" \
   --project="${PROJECT}" \
   --role="roles/iam.workloadIdentityUser" \
   --member="${MEMBER}" \
@@ -178,7 +201,7 @@ gcloud iam service-accounts add-iam-policy-binding "${SA_EMAIL}" \
 
 cat <<EOF
 
-Done. Paste these into .github/workflows/deploy.yml:
+Done. Values for .github/workflows/deploy-gcp.yml:
 
   workload_identity_provider: ${PROVIDER_NAME}
   service_account: ${SA_EMAIL}
