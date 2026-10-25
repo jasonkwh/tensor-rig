@@ -142,7 +142,7 @@ PROVIDER_NAME="projects/${PROJECT_NUMBER}/locations/global/workloadIdentityPools
 # redundant for authorization but shows up in audit logs, which helps when
 # you are asking "who deployed this".
 ATTRIBUTE_MAPPING="google.subject=assertion.sub,attribute.repository=assertion.repository"
-ATTRIBUTE_CONDITION="assertion.repository=='${REPO}' && assertion.sub=='repo:${REPO}:environment:${ENVIRONMENT}'"
+ATTRIBUTE_CONDITION="assertion.repository=='${REPO}' && assertion.environment=='${ENVIRONMENT}'"
 
 log "service account ${SA_EMAIL}"
 if gcloud iam service-accounts describe "${SA_EMAIL}" --project="${PROJECT}" >/dev/null 2>&1; then
@@ -179,7 +179,23 @@ log "OIDC provider ${DEFAULT_PROVIDER}"
 if gcloud iam workload-identity-pools providers describe "${DEFAULT_PROVIDER}" \
   --project="${PROJECT}" --location=global \
   --workload-identity-pool="${DEFAULT_POOL}" >/dev/null 2>&1; then
-  log "  exists (conditions unchanged; update by hand if the repo or environment moved)"
+  log "  exists"
+  CURRENT_CONDITION=$(gcloud iam workload-identity-pools providers describe "${DEFAULT_PROVIDER}" \
+    --project="${PROJECT}" --location=global \
+    --workload-identity-pool="${DEFAULT_POOL}" \
+    --format='value(attributeCondition)')
+
+  if [[ "${CURRENT_CONDITION}" != "${ATTRIBUTE_CONDITION}" ]]; then
+    log "  condition differs, updating"
+    gcloud iam workload-identity-pools providers update-oidc "${DEFAULT_PROVIDER}" \
+      --project="${PROJECT}" \
+      --location=global \
+      --workload-identity-pool="${DEFAULT_POOL}" \
+      --attribute-mapping="${ATTRIBUTE_MAPPING}" \
+      --attribute-condition="${ATTRIBUTE_CONDITION}"
+  else
+    log "  condition already current"
+  fi
 else
   gcloud iam workload-identity-pools providers create-oidc "${DEFAULT_PROVIDER}" \
     --project="${PROJECT}" \
