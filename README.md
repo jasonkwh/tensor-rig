@@ -72,6 +72,25 @@ pulumi stack init gcp
 
 An empty `cloud` value deploys to GCP.
 
+### Deploy from GitHub Actions
+
+The `deploy-gcp` workflow applies the `gcp` stack from a runner, so nothing has to be compiled on a workstation. It authenticates with Workload Identity Federation: no service account key is stored anywhere, and credentials are only minted for jobs in the `deploy` environment.
+
+Run `scripts/setup-gcp-wif.sh` once with credentials that can manage IAM. It creates the service account, the pool, the provider, and the impersonation binding, then prints the values the workflow needs:
+
+```bash
+scripts/setup-gcp-wif.sh            # --help for project, repo, environment
+```
+
+Before the first run:
+
+- create the GitHub environment `deploy` with a required reviewer
+- add repository secret `PULUMI_ACCESS_TOKEN`
+- add repository secret `TS_AUTH_KEY_RIG`
+- add repository variable `GCP_SA_EMAIL` (the script prints it)
+
+The provider's attribute condition accepts only jobs from this repository running in the `deploy` environment, so a fork, a pull request, or a workflow edited on a branch cannot mint credentials. Pools and IAM bindings can take five minutes to propagate.
+
 ## Connect
 
 After boot, the node appears on your tailnet as **`cloudInitHostname`**. Both committed stacks still use **`instanceName`** `tensor-rig-instance-au` in the cloud console.

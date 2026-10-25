@@ -1,0 +1,59 @@
+name: Deploy (gcp)
+on:
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    name: pulumi up (gcp)
+    runs-on: ubuntu-latest
+    environment: deploy
+
+    permissions:
+      contents: read
+      id-token: write
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v7
+
+      - name: Set up Go
+        uses: actions/setup-go@v7
+        with:
+          go-version: 1.27
+          check-latest: true
+          cache: true
+
+      - name: Cache Pulumi plugins
+        uses: actions/cache@v6
+        with:
+          path: ~/.pulumi/plugins
+          key: pulumi-plugins-${{ hashFiles('go.sum') }}
+
+      - name: Write tailscale auth key
+        env:
+          TS_AUTH_KEY_RIG: ${{ secrets.TS_AUTH_KEY_RIG }}
+        run: |
+          mkdir -p "${HOME}/.secrets"
+          printf 'ts_auth_key_rig=%s\n' "${TS_AUTH_KEY_RIG}" > "${HOME}/.secrets/headless-env"
+          chmod 600 "${HOME}/.secrets/headless-env"
+
+      - name: Authenticate to Google Cloud
+        id: auth
+        uses: google-github-actions/auth@v3
+        with:
+          workload_identity_provider: projects/342105122936/locations/global/workloadIdentityPools/github/providers/tensor-rig
+          service_account: ${{ vars.GCP_SA_EMAIL }}
+          token_format: access_token
+          access_token_lifetime: 3600s
+
+      - name: pulumi up
+        uses: pulumi/actions@v7
+        with:
+          command: up
+          stack-name: gcp
+          pulumi-version: 3.272.0
+          comment-on-summary: true
+          suppress-progress: true
+        env:
+          PULUMI_ACCESS_TOKEN: ${{ secrets.PULUMI_ACCESS_TOKEN }}
+          GOOGLE_OAUTH_ACCESS_TOKEN: ${{ steps.auth.outputs.access_token }}
