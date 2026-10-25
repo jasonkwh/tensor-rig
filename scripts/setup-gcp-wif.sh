@@ -176,9 +176,14 @@ else
 fi
 
 log "OIDC provider ${DEFAULT_PROVIDER}"
-if gcloud iam workload-identity-pools providers describe "${DEFAULT_PROVIDER}" \
+# A deleted provider lingers as a DELETED tombstone that describe still
+# returns, so presence alone is not enough to decide it is usable.
+PROVIDER_STATE=$(gcloud iam workload-identity-pools providers describe "${DEFAULT_PROVIDER}" \
   --project="${PROJECT}" --location=global \
-  --workload-identity-pool="${DEFAULT_POOL}" >/dev/null 2>&1; then
+  --workload-identity-pool="${DEFAULT_POOL}" \
+  --format='value(state)' 2>/dev/null || true)
+
+if [[ "${PROVIDER_STATE}" == "ACTIVE" ]]; then
   log "  exists"
 else
   gcloud iam workload-identity-pools providers create-oidc "${DEFAULT_PROVIDER}" \
