@@ -41,7 +41,7 @@ jobs:
         id: auth
         uses: google-github-actions/auth@v3
         with:
-          workload_identity_provider: projects/342105122936/locations/global/workloadIdentityPools/github/providers/tensor-rig
+          workload_identity_provider: projects/342105122936/locations/global/workloadIdentityPools/github/providers/tensor-rig-v2
           service_account: ${{ vars.GCP_SA_EMAIL }}
           token_format: access_token
           access_token_lifetime: 3600s

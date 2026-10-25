@@ -6,7 +6,7 @@ readonly DEFAULT_REPO="jasonkwh/tensor-rig"
 readonly DEFAULT_ENVIRONMENT="deploy"
 readonly DEFAULT_SA_NAME="pulumi-deploy"
 readonly DEFAULT_POOL="github"
-readonly DEFAULT_PROVIDER="tensor-rig"
+readonly DEFAULT_PROVIDER="tensor-rig-v2"
 
 # Least privilege for what this program actually creates: a GCE instance, a
 # GCS bucket, and the service account attached to that instance.
