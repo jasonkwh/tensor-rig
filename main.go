@@ -19,22 +19,27 @@ func main() {
 		}
 
 		region := cfg.Get("location")
+		dependsOn := make([]pulumi.Resource, 0)
 
-		store := storage.New(cloud, &storage.Config{
-			Name:                     cfg.Get("storageName"),
-			Location:                 region,
-			ForceDestroy:             cfg.GetBool("storageForceDestroy"),
-			LifecycleRules:           []storage.LifecycleRule{{DeleteAfterDays: cfg.GetInt("storageDeleteAfterDays")}},
-			VersioningEnabled:        cfg.GetBool("storageVersioning"),
-			UniformBucketLevelAccess: cfg.GetBool("storageUniformAccess"),
-			PublicAccessPrevention:   storage.PublicAccessPrevention(cfg.Get("storagePublicAccess")),
-			StorageClass:             storage.StorageClass(cfg.Get("storageClass")),
-			SoftDeleteEnabled:        cfg.GetBool("storageSoftDelete"),
-		})
+		if cfg.GetBool("storageEnabled") {
+			store := storage.New(cloud, &storage.Config{
+				Name:                     cfg.Get("storageName"),
+				Location:                 region,
+				ForceDestroy:             cfg.GetBool("storageForceDestroy"),
+				LifecycleRules:           []storage.LifecycleRule{{DeleteAfterDays: cfg.GetInt("storageDeleteAfterDays")}},
+				VersioningEnabled:        cfg.GetBool("storageVersioning"),
+				UniformBucketLevelAccess: cfg.GetBool("storageUniformAccess"),
+				PublicAccessPrevention:   storage.PublicAccessPrevention(cfg.Get("storagePublicAccess")),
+				StorageClass:             storage.StorageClass(cfg.Get("storageClass")),
+				SoftDeleteEnabled:        cfg.GetBool("storageSoftDelete"),
+			})
 
-		bucket, err := store.Create(ctx)
-		if err != nil {
-			return err
+			bucket, err := store.Create(ctx)
+			if err != nil {
+				return err
+			}
+
+			dependsOn = append(dependsOn, bucket)
 		}
 
 		tsConfig, err := cloudinit.New(
@@ -62,7 +67,7 @@ func main() {
 			ProvisioningModel:     instance.ProvisioningModel(cfg.Get("instanceProvisioningModel")),
 		})
 
-		if _, err = vm.Create(ctx, pulumi.DependsOn([]pulumi.Resource{bucket})); err != nil {
+		if _, err = vm.Create(ctx, pulumi.DependsOn(dependsOn)); err != nil {
 			return err
 		}
 

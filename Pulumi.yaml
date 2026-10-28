@@ -16,6 +16,10 @@ config:
     type: string
     description: Tailnet hostname for tailscale up --hostname. Not the cloud resource name (instanceName).
     default: jasonkwh-tensor-rig
+  storageEnabled:
+    type: boolean
+    description: Enable storage.
+    default: true
   storageName:
     type: string
     description: Bucket name.
