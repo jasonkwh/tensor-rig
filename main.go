@@ -34,9 +34,9 @@ func main() {
 				SoftDeleteEnabled:        cfg.GetBool("storageSoftDelete"),
 			})
 
-			bucket, err := store.Create(ctx)
-			if err != nil {
-				return err
+			bucket, berr := store.Create(ctx)
+			if berr != nil {
+				return berr
 			}
 
 			dependsOn = append(dependsOn, bucket)
