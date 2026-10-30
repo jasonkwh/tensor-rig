@@ -14,6 +14,8 @@ users:
     sudo: ALL=(ALL) NOPASSWD:ALL
     lock_passwd: true
 {{end}}
+packages:
+  - python3-venv
 write_files:
   - path: /usr/local/sbin/tensor-rig-tailscale
     owner: root:root
