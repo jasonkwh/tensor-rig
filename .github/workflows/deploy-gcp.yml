@@ -1,6 +1,14 @@
 name: Deploy (gcp)
 on:
   workflow_dispatch:
+    inputs:
+      stack:
+        description: "Stack to deploy"
+        required: true
+        default: "gcp"
+        type: choice
+        options:
+          - gcp
 
 jobs:
   deploy:
@@ -50,7 +58,7 @@ jobs:
         uses: pulumi/actions@v7
         with:
           command: up
-          stack-name: gcp
+          stack-name: ${{ inputs.stack }}
           pulumi-version: 3.272.0
           comment-on-summary: true
           suppress-progress: true
