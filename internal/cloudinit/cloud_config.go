@@ -15,6 +15,7 @@ users:
     lock_passwd: true
 {{end}}
 packages:
+  - make
   - python3-venv
 write_files:
   - path: /usr/local/sbin/tensor-rig-tailscale
