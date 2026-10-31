@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-readonly DEFAULT_ROOT="${ARTIFACT_ROOT:-${HOME}/DeepMario-SMW}"
+readonly DEFAULT_ROOT="${ARTIFACT_ROOT:-${HOME}/DeepMario-SMW-Vision}"
 readonly ARTIFACT_DIRS=(mario_checkpoints mario_best_model mario_logs mario_videos)
 
 usage() {
@@ -16,7 +16,7 @@ aws s3). The instance service account / instance profile already has write
 access to the bucket, so no credentials are needed on the box.
 
 Options:
-  -r, --root DIR       training checkout to push (default: $HOME/DeepMario-SMW,
+  -r, --root DIR       training checkout to push (default: $HOME/DeepMario-SMW-Vision,
                        or $ARTIFACT_ROOT)
   -i, --interval SECS  seconds between passes (default: 300; 0 = push once and
                        exit, useful right before tearing the rig down)

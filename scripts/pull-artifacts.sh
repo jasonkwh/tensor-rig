@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-readonly DEFAULT_ROOT="${ARTIFACT_ROOT:-${HOME}/DeepMario-SMW}"
+readonly DEFAULT_ROOT="${ARTIFACT_ROOT:-${HOME}/DeepMario-SMW-Vision}"
 ARTIFACT_DIRS=(mario_checkpoints mario_best_model mario_logs)
 
 usage() {
@@ -17,7 +17,7 @@ on a fresh box. Nothing is deleted locally.
 
 Options:
   -r, --root DIR   training checkout to restore into (default:
-                   $HOME/DeepMario-SMW, or $ARTIFACT_ROOT)
+                   $HOME/DeepMario-SMW-Vision, or $ARTIFACT_ROOT)
   -v, --videos     also pull mario_videos (large, off by default)
   -h, --help       show this help
 
