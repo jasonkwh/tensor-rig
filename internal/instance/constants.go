@@ -1,7 +1,9 @@
 package instance
 
 const (
-	tailscaleUDPPort = 41641
+	tailscaleUDPPort         = 41641
+	publicTCPPort            = 443
+	gcpAllowPublicTCPPriority = 950
 
 	awsAssumeRolePolicy = `{
   "Version": "2012-10-17",

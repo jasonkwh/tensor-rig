@@ -32,7 +32,7 @@ func (i *instanceAWS) awsInstanceNetworking(
 	}
 
 	out := awsInstanceNetwork{subnetID: subnetID}
-	if !cfg.RestrictPublicIngress {
+	if !cfg.RestrictPublicIngress && !cfg.OpenTCP443 {
 		return out, nil
 	}
 
@@ -90,10 +90,10 @@ func (i *instanceAWS) awsRestrictPublicIngress(
 
 	return ec2.NewSecurityGroup(ctx, name, &ec2.SecurityGroupArgs{
 		Name:        pulumi.String(name),
-		Description: pulumi.String("tensor-rig: block public TCP; allow Tailscale WireGuard UDP"),
+		Description: pulumi.String(awsSecurityGroupDescription(cfg)),
 		VpcId:       pulumi.String(vpcID),
 		Region:      pulumi.String(cfg.Location),
-		Ingress:     awsTailscaleIngress(),
+		Ingress:     awsRestrictedIngress(cfg.OpenTCP443),
 		Egress:      awsAllEgress(),
 		Tags: pulumi.StringMap{
 			"Name": pulumi.String(name),
@@ -101,8 +101,20 @@ func (i *instanceAWS) awsRestrictPublicIngress(
 	}, opts...)
 }
 
-func awsTailscaleIngress() ec2.SecurityGroupIngressArray {
-	return ec2.SecurityGroupIngressArray{
+func awsSecurityGroupDescription(cfg *Config) string {
+	if cfg.OpenTCP443 && !cfg.RestrictPublicIngress {
+		return "tensor-rig: allow public TCP 443 and Tailscale WireGuard UDP"
+	}
+
+	if cfg.OpenTCP443 {
+		return "tensor-rig: block public TCP except 443; allow Tailscale WireGuard UDP"
+	}
+
+	return "tensor-rig: block public TCP; allow Tailscale WireGuard UDP"
+}
+
+func awsRestrictedIngress(openTCP443 bool) ec2.SecurityGroupIngressArray {
+	rules := ec2.SecurityGroupIngressArray{
 		&ec2.SecurityGroupIngressArgs{
 			Protocol:       pulumi.String("udp"),
 			FromPort:       pulumi.Int(tailscaleUDPPort),
@@ -111,6 +123,17 @@ func awsTailscaleIngress() ec2.SecurityGroupIngressArray {
 			Ipv6CidrBlocks: awsPublicIPv6CIDRBlocks,
 		},
 	}
+	if !openTCP443 {
+		return rules
+	}
+
+	return append(rules, &ec2.SecurityGroupIngressArgs{
+		Protocol:       pulumi.String("tcp"),
+		FromPort:       pulumi.Int(publicTCPPort),
+		ToPort:         pulumi.Int(publicTCPPort),
+		CidrBlocks:     awsPublicCIDRBlocks,
+		Ipv6CidrBlocks: awsPublicIPv6CIDRBlocks,
+	})
 }
 
 func awsAllEgress() ec2.SecurityGroupEgressArray {

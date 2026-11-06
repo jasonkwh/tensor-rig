@@ -21,3 +21,21 @@ func ParseCloud(name string) (Cloud, error) {
 		return CloudGCP, ErrUnknownCloud(name)
 	}
 }
+
+type CloudRigKind string
+
+const (
+	CloudRigKindTensor CloudRigKind = "tensor"
+	CloudRigKindLadder CloudRigKind = "ladder"
+)
+
+func ParseCloudRigKind(name string) (CloudRigKind, error) {
+	switch CloudRigKind(strings.ToLower(strings.TrimSpace(name))) {
+	case "", CloudRigKindTensor:
+		return CloudRigKindTensor, nil
+	case CloudRigKindLadder:
+		return CloudRigKindLadder, nil
+	default:
+		return CloudRigKindTensor, ErrUnknownCloudRigKind(name)
+	}
+}

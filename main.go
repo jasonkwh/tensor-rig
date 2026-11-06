@@ -42,9 +42,15 @@ func main() {
 			dependsOn = append(dependsOn, bucket)
 		}
 
+		kind, err := rig.ParseCloudRigKind(cfg.Get("cloudRigKind"))
+		if err != nil {
+			return err
+		}
+
 		tsConfig, err := cloudinit.New(
 			cloudinit.WithLoginUser(cfg.Get("cloudInitLoginUser")),
-			cloudinit.WithHostname(cfg.Get("cloudInitHostname")))
+			cloudinit.WithHostname(cfg.Get("cloudInitHostname")),
+			cloudinit.WithRigKind(kind))
 		if err != nil {
 			return err
 		}
@@ -61,6 +67,7 @@ func main() {
 			NicType:               cfg.Get("instanceNicType"),
 			AssignPublicIP:        cfg.GetBool("instanceAssignPublicIP"),
 			RestrictPublicIngress: cfg.GetBool("instanceRestrictPublicIngress"),
+			OpenTCP443:            kind == rig.CloudRigKindLadder,
 			AcceleratorType:       cfg.Get("instanceAcceleratorType"),
 			AcceleratorCount:      cfg.GetInt("instanceAcceleratorCount"),
 			OnHostMaintenance:     cfg.Get("instanceOnHostMaintenance"),
