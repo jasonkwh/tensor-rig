@@ -33,6 +33,34 @@ func loadTailscaleAuthKey(filePath string) (string, error) {
 	return "", ErrNoAuthKey
 }
 
+func loadTrimmedFile(filePath string, loadErr func(error) error, empty error) (string, error) {
+	path, err := expandHomePath(filePath)
+	if err != nil {
+		return "", loadErr(err)
+	}
+
+	content, err := os.ReadFile(path)
+	if err != nil {
+		return "", loadErr(err)
+	}
+
+	value := strings.TrimSpace(string(content))
+	if value == "" {
+		return "", empty
+	}
+
+	return value, nil
+}
+
+func indentLines(body, prefix string) string {
+	lines := strings.Split(strings.TrimRight(body, "\n"), "\n")
+	for idx, line := range lines {
+		lines[idx] = prefix + line
+	}
+
+	return strings.Join(lines, "\n")
+}
+
 func expandHomePath(path string) (string, error) {
 	if !strings.HasPrefix(path, "~/") {
 		return path, nil

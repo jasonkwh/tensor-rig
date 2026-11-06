@@ -12,6 +12,7 @@ type Config struct {
 	NicType               string // GCP only.
 	AssignPublicIP        bool
 	RestrictPublicIngress bool
+	OpenTCP443            bool
 	AcceleratorType       string // GCP only.
 	AcceleratorCount      int    // GCP only.
 	OnHostMaintenance     string

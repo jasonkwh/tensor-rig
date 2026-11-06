@@ -38,6 +38,12 @@ func (i *instanceGCP) gcpInstanceNetworking(
 		}
 	}
 
+	if cfg.OpenTCP443 {
+		if err := i.gcpAllowPublicTCP(ctx, cfg, tags, opts...); err != nil {
+			return nil, nil, err
+		}
+	}
+
 	return gcpNetworkInterface(cfg), tags, nil
 }
 
@@ -57,7 +63,7 @@ func gcpNetworkInterface(cfg *Config) *compute.InstanceNetworkInterfaceArgs {
 }
 
 func gcpInstanceNetworkTags(cfg *Config) pulumi.StringArray {
-	if !cfg.RestrictPublicIngress {
+	if !cfg.RestrictPublicIngress && !cfg.OpenTCP443 {
 		return pulumi.StringArray{}
 	}
 
@@ -111,6 +117,41 @@ func (i *instanceGCP) gcpRestrictPublicIngress(
 				network, targetTags, rule, src.ranges, opts...); err != nil {
 				return err
 			}
+		}
+	}
+
+	return nil
+}
+
+func (i *instanceGCP) gcpAllowPublicTCP(
+	ctx *pulumi.Context,
+	cfg *Config,
+	targetTags pulumi.StringArray,
+	opts ...pulumi.ResourceOption,
+) error {
+	network := gcpNetwork(cfg)
+	rule := gcpIngressFirewallRule{
+		suffix:   "allow-public-tcp-443",
+		priority: gcpAllowPublicTCPPriority,
+		allows: compute.FirewallAllowArray{
+			&compute.FirewallAllowArgs{
+				Protocol: pulumi.String("tcp"),
+				Ports:    pulumi.StringArray{pulumi.String(strconv.Itoa(publicTCPPort))},
+			},
+		},
+	}
+
+	for _, src := range []struct {
+		nameSuffix string
+		ranges     pulumi.StringArray
+	}{
+		{"", gcpPublicIngressSourceRanges},
+		{"-ipv6", gcpPublicIngressSourceRangesIPv6},
+	} {
+		if err := gcpNewIngressFirewall(ctx,
+			fmt.Sprintf("%s-%s%s", cfg.Name, rule.suffix, src.nameSuffix),
+			network, targetTags, rule, src.ranges, opts...); err != nil {
+			return err
 		}
 	}
 

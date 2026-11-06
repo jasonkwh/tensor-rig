@@ -89,8 +89,12 @@ write_files:
 
       [Install]
       WantedBy=multi-user.target
+{{if .ExtraFiles -}}
+{{.ExtraFiles}}{{end -}}
 runcmd:
   - [systemctl, daemon-reload]
   - [systemctl, enable, --now, tensor-rig-tailscale.service]
   - [systemctl, enable, --now, tensor-rig-node-exporter.service]
+{{if .ExtraRunCmd -}}
+{{.ExtraRunCmd}}{{end -}}
 `
