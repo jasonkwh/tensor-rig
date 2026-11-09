@@ -1,0 +1,42 @@
+name: Coverage
+on:
+  workflow_dispatch:
+  push:
+
+jobs:
+  coverage:
+    name: test coverage
+    runs-on: ubuntu-latest
+    env:
+      MIN_COVERAGE: 70
+
+    steps:
+      # Checkout your code
+      - name: Checkout code
+        uses: actions/checkout@v7
+
+      # Set up Go environment
+      - name: Set up Go
+        uses: actions/setup-go@v7
+        with:
+          go-version: 1.27
+          check-latest: true
+          cache: true
+
+      - name: Download Dependencies
+        run: go mod download
+
+      - name: Run tests with coverage
+        run: make test-coverage
+
+      - name: Check coverage
+        run: |
+          go tool cover -func=coverage.out
+          total=$(go tool cover -func=coverage.out | awk '/^total:/ { gsub(/%/, "", $3); print $3 }')
+          total=${total:-0}
+          echo "Total coverage: ${total}% (minimum ${MIN_COVERAGE}%)"
+          {
+            echo "### Test coverage"
+            echo "${total}% (minimum ${MIN_COVERAGE}%)"
+          } >> "$GITHUB_STEP_SUMMARY"
+          awk -v total="$total" -v min="$MIN_COVERAGE" 'BEGIN { if (total+0 < min+0) exit 1 }'

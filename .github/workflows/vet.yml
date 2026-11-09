@@ -1,0 +1,28 @@
+name: Vet
+on:
+  workflow_dispatch:
+  push:
+
+jobs:
+  vet:
+    name: go vet
+    runs-on: ubuntu-latest
+
+    steps:
+      # Checkout your code
+      - name: Checkout code
+        uses: actions/checkout@v7
+
+      # Set up Go environment
+      - name: Set up Go
+        uses: actions/setup-go@v7
+        with:
+          go-version: 1.27
+          check-latest: true
+          cache: true
+
+      - name: Download Dependencies
+        run: go mod download
+
+      - name: Run go vet
+        run: go vet ./...
