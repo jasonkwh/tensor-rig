@@ -27,7 +27,7 @@ jobs:
       - name: Run golangci-lint
         uses: golangci/golangci-lint-action@v9
         with:
-          version: v2.14.0
+          version: v2.15.0
 
   shellcheck:
     name: shell linting
@@ -39,4 +39,3 @@ jobs:
 
       - name: Run shellcheck
         run: shellcheck --shell=bash --severity=style scripts/*.sh
-
