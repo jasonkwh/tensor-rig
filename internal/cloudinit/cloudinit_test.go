@@ -17,7 +17,7 @@ func (s *cloudInitSuite) TestCloudInitDefaultFilePathWhenSecretsMissing() {
 	s.T().Setenv("HOME", s.T().TempDir())
 
 	ts, err := cloudinit.New()
-	s.Require().Error(err)
+	s.ErrorIs(err, cloudinit.ErrLoadAuthKey)
 	s.Equal(cloudinit.DefaultFilePath, ts.FilePath())
 }
 

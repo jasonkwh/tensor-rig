@@ -52,7 +52,7 @@ func (t *tsCloudConfig) Execute() (string, error) {
 		LoginUser:       t.loginUser,
 		CreateLoginUser: t.loginUser != DefaultLoginUser,
 	}); err != nil {
-		return "", ErrRenderCloudConfig(err)
+		return "", errRenderCloudConfig(err)
 	}
 
 	return body.String(), nil

@@ -6,12 +6,15 @@ import (
 )
 
 var (
-	ErrNoAuthKey = errors.New("cloudinit: auth key field missing")
-
-	ErrLoadAuthKey = func(err error) error {
-		return fmt.Errorf("cloudinit: load auth key: %w", err)
-	}
-	ErrRenderCloudConfig = func(err error) error {
-		return fmt.Errorf("cloudinit: render cloud-config: %w", err)
-	}
+	ErrNoAuthKey         = errors.New("no auth key")
+	ErrLoadAuthKey       = errors.New("load auth key")
+	ErrRenderCloudConfig = errors.New("render cloud-config")
 )
+
+func errLoadAuthKey(err error) error {
+	return fmt.Errorf("%w: %w", ErrLoadAuthKey, err)
+}
+
+func errRenderCloudConfig(err error) error {
+	return fmt.Errorf("%w: %w", ErrRenderCloudConfig, err)
+}

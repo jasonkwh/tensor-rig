@@ -13,12 +13,12 @@ func shellSingleQuote(value string) string {
 func loadTailscaleAuthKey(filePath string) (string, error) {
 	path, err := expandHomePath(filePath)
 	if err != nil {
-		return "", ErrLoadAuthKey(err)
+		return "", errLoadAuthKey(err)
 	}
 
 	content, err := os.ReadFile(path)
 	if err != nil {
-		return "", ErrLoadAuthKey(err)
+		return "", errLoadAuthKey(err)
 	}
 
 	for line := range strings.Lines(string(content)) {

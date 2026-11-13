@@ -1,9 +1,14 @@
 package rig
 
-import "fmt"
+import (
+	"errors"
+	"fmt"
+)
 
 var (
-	ErrUnknownCloud = func(name string) error {
-		return fmt.Errorf("rig: unknown cloud: %s", name) //nolint:err113
-	}
+	ErrUnknownCloud = errors.New("unknown cloud name")
 )
+
+func errUnknownCloud(name string) error {
+	return fmt.Errorf("%w: %s", ErrUnknownCloud, name)
+}

@@ -19,6 +19,6 @@ func ParseCloud(name string) (Cloud, error) {
 	case CloudAWS:
 		return CloudAWS, nil
 	default:
-		return CloudUnknown, ErrUnknownCloud(name)
+		return CloudUnknown, errUnknownCloud(name)
 	}
 }
