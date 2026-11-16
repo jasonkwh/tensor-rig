@@ -3,8 +3,8 @@ package rig_test
 import (
 	"testing"
 
+	"github.com/go-openapi/testify/v2/assert"
 	"github.com/jasonkwh/tensor-rig/internal/rig"
-	"github.com/stretchr/testify/assert"
 )
 
 func TestParseCloud(t *testing.T) {
