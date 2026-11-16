@@ -10,4 +10,4 @@ test-clean-cache:
 	go clean -testcache
 
 test-coverage:
-	go test -count=1 -covermode=atomic -coverprofile=coverage.out $$(go list ./... | grep -vE '/(proto|mocks|graph)(/|$$)')
+	go test -count=1 -covermode=atomic -coverprofile=coverage.out $$(go list ./... | grep -vE '/(proto|mocks|graph|cmd)(/|$$)')
